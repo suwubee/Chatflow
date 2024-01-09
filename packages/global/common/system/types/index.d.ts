@@ -51,6 +51,7 @@ export type FastGPTFeConfigsType = {
   favicon?: string;
   customApiDomain?: string;
   customSharePageDomain?: string;
+  baseUrl?: string;
 };
 
 export type SystemEnvType = {
