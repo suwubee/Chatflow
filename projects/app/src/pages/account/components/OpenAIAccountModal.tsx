@@ -5,6 +5,7 @@ import { useTranslation } from 'next-i18next';
 import { useForm } from 'react-hook-form';
 import { useRequest } from '@/web/common/hooks/useRequest';
 import type { UserType } from '@fastgpt/global/support/user/type.d';
+import { feConfigs } from '@/web/common/system/staticData';
 
 const OpenAIAccountModal = ({
   defaultData,
@@ -16,17 +17,29 @@ const OpenAIAccountModal = ({
   onClose: () => void;
 }) => {
   const { t } = useTranslation();
-  const { register, handleSubmit } = useForm({
-    defaultValues: defaultData
+  const { register, handleSubmit, getValues } = useForm({
+    defaultValues: {
+      ...defaultData,
+      baseUrl: feConfigs.baseUrl || defaultData?.baseUrl,
+    }
   });
 
   const { mutate: onSubmit, isLoading } = useRequest({
-    mutationFn: async (data: UserType['openaiAccount']) => onSuccess(data),
+    mutationFn: async () => {
+      const formData = getValues();
+      const dataWithFixedBaseUrl = {
+        key: formData.key || '', 
+        baseUrl: feConfigs.baseUrl || formData.baseUrl || '', 
+      };
+      return onSuccess(dataWithFixedBaseUrl);
+    },
     onSuccess(res) {
       onClose();
     },
     errorToast: t('user.Set OpenAI Account Failed')
   });
+
+  const isBaseUrlFixed = !!feConfigs.baseUrl;
 
   return (
     <MyModal
@@ -36,21 +49,28 @@ const OpenAIAccountModal = ({
       title={t('user.OpenAI Account Setting')}
     >
       <ModalBody>
-        <Box fontSize={'sm'} color={'myGray.500'}>
-          可以填写 OpenAI/OneAPI 的相关秘钥。如果你填写了该内容，在线上平台使用 OpenAI Chat
+	    <Box fontSize={'sm'} color={'myGray.500'}>
+          可以填写 API 的相关秘钥。如果你填写了该内容，在线上平台使用自定义的API接口
           模型不会计费（不包含知识库训练、索引生成）。请注意你的 Key 是否有访问对应模型的权限。
         </Box>
+        {/* API Key Input */}
         <Flex alignItems={'center'} mt={5}>
           <Box flex={'0 0 65px'}>API Key:</Box>
           <Input flex={1} {...register('key')}></Input>
         </Flex>
+
+        {/* BaseUrl */}
         <Flex alignItems={'center'} mt={5}>
           <Box flex={'0 0 65px'}>BaseUrl:</Box>
-          <Input
-            flex={1}
-            {...register('baseUrl')}
-            placeholder={'请求地址，默认为 openai 官方。可填中转地址，未自动补全 "v1"'}
-          ></Input>
+          {isBaseUrlFixed ? (
+            <Box flex={1}>{feConfigs.baseUrl}</Box>
+          ) : (
+            <Input
+              flex={1}
+              {...register('baseUrl')}
+              placeholder={'请求地址，可填中转地址，请加目录 "v1"'}
+            ></Input>
+          )}
         </Flex>
       </ModalBody>
       <ModalFooter>
