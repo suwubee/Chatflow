@@ -51,6 +51,7 @@ export type FastGPTFeConfigsType = {
   favicon?: string;
   customApiDomain?: string;
   customSharePageDomain?: string;
+  baseUrl?: string;
 };
 
 export type SystemEnvType = {
@@ -58,7 +59,6 @@ export type SystemEnvType = {
   vectorMaxProcess: number;
   qaMaxProcess: number;
   pgHNSWEfSearch: number;
-  baseUrl?: string;
 };
 
 declare global {
