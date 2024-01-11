@@ -157,7 +157,7 @@ const LoginForm = ({ setPageType, loginSuccess }: Props) => {
         </FormControl>
         {feConfigs?.docUrl && (
           <Box mt={7} fontSize={'sm'}>
-            使用即代表你同意我们的{' '}
+            本系统由<Link href={'https://github.com/labring/FastGPT/'} target={'_blank'} color={'primary.500'}>开源FastGPT</Link>开发，使用即代表你同意我们的{' '}
             <Link
               href={getDocPath('/docs/agreement/disclaimer/')}
               target={'_blank'}
