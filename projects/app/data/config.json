@@ -18,14 +18,14 @@
     "concatMd": "* QQ群: 9197001",
     "limit": [{ "exportLimitMinutes": 0,"websiteSyncLimitMinuted": 0 }],
     "scripts": [],
-    "favicon": "/favicon.ico"
+    "favicon": "/favicon.ico",
+    "baseUrl":"https://chatapi.aisws.com/v1/"
   },
   "systemEnv": {
     "openapiPrefix": "fastgpt",
     "vectorMaxProcess": 15,
     "qaMaxProcess": 15,
-    "pgHNSWEfSearch": 100,
-	"baseUrl":"https://chatapi.aisws.com/v1/"
+    "pgHNSWEfSearch": 100
   },
   "chatModels": [
 {"model":"SparkDesk", "name":"SparkDesk", "inputPrice":0.03, "outputPrice":0.03, "maxContext":8000, "maxResponse":8000, "quoteMaxToken":4000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
