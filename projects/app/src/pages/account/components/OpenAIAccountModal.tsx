@@ -5,6 +5,7 @@ import { useTranslation } from 'next-i18next';
 import { useForm } from 'react-hook-form';
 import { useRequest } from '@/web/common/hooks/useRequest';
 import type { UserType } from '@fastgpt/global/support/user/type.d';
+import { feConfigs } from '@/web/common/system/staticData';
 
 const OpenAIAccountModal = ({
   defaultData,
@@ -19,7 +20,7 @@ const OpenAIAccountModal = ({
   const { register, handleSubmit, getValues } = useForm({
     defaultValues: {
       ...defaultData,
-      baseUrl: global.systemEnv.baseUrl || defaultData?.baseUrl,
+      baseUrl: feConfigs.baseUrl || defaultData?.baseUrl,
     }
   });
 
@@ -28,7 +29,7 @@ const OpenAIAccountModal = ({
       const formData = getValues();
       const dataWithFixedBaseUrl = {
         key: formData.key || '', 
-        baseUrl: global.systemEnv.baseUrl || formData.baseUrl || '', 
+        baseUrl: feConfigs.baseUrl || formData.baseUrl || '', 
       };
       return onSuccess(dataWithFixedBaseUrl);
     },
@@ -38,7 +39,7 @@ const OpenAIAccountModal = ({
     errorToast: t('user.Set OpenAI Account Failed')
   });
 
-  const isBaseUrlFixed = !!global.systemEnv.baseUrl;
+  const isBaseUrlFixed = !!feConfigs.baseUrl;
 
   return (
     <MyModal
@@ -62,7 +63,7 @@ const OpenAIAccountModal = ({
         <Flex alignItems={'center'} mt={5}>
           <Box flex={'0 0 65px'}>BaseUrl:</Box>
           {isBaseUrlFixed ? (
-            <Box flex={1}>{global.systemEnv.baseUrl}</Box>
+            <Box flex={1}>{feConfigs.baseUrl}</Box>
           ) : (
             <Input
               flex={1}
