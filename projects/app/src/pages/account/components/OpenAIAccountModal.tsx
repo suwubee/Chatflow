@@ -20,7 +20,7 @@ const OpenAIAccountModal = ({
   const { register, handleSubmit, getValues } = useForm({
     defaultValues: {
       ...defaultData,
-      baseUrl: feConfigs.baseUrl || defaultData?.baseUrl,
+      baseUrl: feConfigs.baseUrl || defaultData?.baseUrl
     }
   });
 
