@@ -52,6 +52,11 @@ export type FastGPTFeConfigsType = {
   customApiDomain?: string;
   customSharePageDomain?: string;
   baseUrl?: string;
+  subscription?: {
+    datasetStoreFreeSize?: number;
+    datasetStorePrice?: number;
+  };
+  uploadFileMaxSize?: number;
 };
 
 export type SystemEnvType = {
@@ -64,4 +69,5 @@ export type SystemEnvType = {
 declare global {
   var feConfigs: FastGPTFeConfigsType;
   var systemEnv: SystemEnvType;
+  var systemInitd: boolean;
 }
