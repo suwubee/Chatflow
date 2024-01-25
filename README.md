@@ -1,8 +1,15 @@
-修改自开源系统 FastGPT，https://github.com/labring/FastGPT
-仅用于智能聊天的后端服务。
+修改自开源系统FastGPT， https://github.com/labring/FastGPT
+仅用于智能聊天的后端服务。  
+
+修改的功能
+* 放出完整的config.json配置，允许自定义开源版本支持的全功能
+* 自定义baseUrl功能，若配置中存在api url，用户不可以编辑
 
 
 更新记录
+### v1.1  20240125
+* 更新 FastGPT v4.6.7 正式版
+
 ### v1.01 20240109
 * 更新 FastGPT v4.6.6 正式版
    
