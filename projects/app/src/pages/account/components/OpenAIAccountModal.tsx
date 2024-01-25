@@ -28,8 +28,8 @@ const OpenAIAccountModal = ({
     mutationFn: async () => {
       const formData = getValues();
       const dataWithFixedBaseUrl = {
-        key: formData.key || '', 
-        baseUrl: feConfigs.baseUrl || formData.baseUrl || '', 
+        key: formData.key || '',
+        baseUrl: feConfigs.baseUrl || formData.baseUrl || ''
       };
       return onSuccess(dataWithFixedBaseUrl);
     },
@@ -49,7 +49,7 @@ const OpenAIAccountModal = ({
       title={t('user.OpenAI Account Setting')}
     >
       <ModalBody>
-	    <Box fontSize={'sm'} color={'myGray.500'}>
+        <Box fontSize={'sm'} color={'myGray.500'}>
           可以填写 API 的相关秘钥。如果你填写了该内容，在线上平台使用自定义的API接口
           模型不会计费（不包含知识库训练、索引生成）。请注意你的 Key 是否有访问对应模型的权限。
         </Box>
