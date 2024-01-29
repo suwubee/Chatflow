@@ -41,7 +41,12 @@
 {"model":"aisws-gpt-3.5-turbo", "name":"AIS35-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":7000, "maxResponse":7000, "quoteMaxToken":4000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
 {"model":"aisws-gpt-3.5-turbo-1106", "name":"AIS35-16k-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":12000, "maxResponse":12000, "quoteMaxToken":8000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
 {"model":"aisws-gpt-4-turbo-preview", "name":"AIS4-turbo-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":120000, "maxResponse":4000, "quoteMaxToken":30000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"aisws-gpt-4-vision-preview", "name":"AIS4-Vision-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":120000, "maxResponse":4000, "quoteMaxToken":30000, "maxTemperature":1.2, "censor":false, "vision":true, "defaultSystemChatPrompt":""}
+{"model":"aisws-gpt-4-vision-preview", "name":"AIS4-Vision-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":120000, "maxResponse":4000, "quoteMaxToken":30000, "maxTemperature":1.2, "censor":false, "vision":true, "defaultSystemChatPrompt":""},
+{"model":"openchat-7b", "name":"Openchat-7b", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":7000, "quoteMaxToken":4000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
+{"model":"mistral-tiny", "name":"Mistral-Tiny", "inputPrice":0.03, "outputPrice":0.03, "maxContext":20000, "maxResponse":30000, "quoteMaxToken":4000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
+{"model":"mistral-small", "name":"Mistral-small", "inputPrice":0.03, "outputPrice":0.03, "maxContext":20000, "maxResponse":30000, "quoteMaxToken":4000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
+{"model":"pplx-7b-chat", "name":"pplx-7b-chat", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":7000, "quoteMaxToken":4000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
+{"model":"openhermes-2.5-mistral-7b", "name":"openhermes-2.5-mistral-7b", "inputPrice":0.03, "outputPrice":0.03, "maxContext":3000, "maxResponse":3000, "quoteMaxToken":4000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""}
   ],
   "qaModels": [
 {"model":"SparkDesk", "name":"SparkDesk", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":"7000"},
@@ -73,7 +78,12 @@
 {"model":"aisws-gpt-3.5-turbo", "name":"AIS35-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":7000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
 {"model":"aisws-gpt-3.5-turbo-1106", "name":"AIS35-16k-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":12000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
 {"model":"aisws-gpt-4-turbo-preview", "name":"AIS4-turbo-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":100000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"aisws-gpt-4-vision-preview", "name":"AIS4-Vision-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":100000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""}
+{"model":"aisws-gpt-4-vision-preview", "name":"AIS4-Vision-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":100000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
+{"model":"openchat-7b", "name":"Openchat-7b", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
+{"model":"mistral-tiny", "name":"Mistral-Tiny", "inputPrice":0.03, "outputPrice":0.03, "maxContext":20000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
+{"model":"mistral-small", "name":"Mistral-small", "inputPrice":0.03, "outputPrice":0.03, "maxContext":20000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
+{"model":"pplx-7b-chat", "name":"pplx-7b-chat", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
+{"model":"openhermes-2.5-mistral-7b", "name":"openhermes-2.5-mistral-7b", "inputPrice":0.03, "outputPrice":0.03, "maxContext":30000, "maxResponse":500, "toolChoice":false, "functionPrompt":""}
   ],
   "extractModels": [
 {"model":"SparkDesk", "name":"SparkDesk", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":500, "toolChoice":true, "functionPrompt":""},
@@ -89,7 +99,12 @@
 {"model":"aisws-gpt-3.5-turbo", "name":"AIS35-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":7000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
 {"model":"aisws-gpt-3.5-turbo-1106", "name":"AIS35-16k-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":12000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
 {"model":"aisws-gpt-4-turbo-preview", "name":"AIS4-turbo-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":100000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"aisws-gpt-4-vision-preview", "name":"AIS4-Vision-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":100000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""}  
+{"model":"aisws-gpt-4-vision-preview", "name":"AIS4-Vision-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":100000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
+{"model":"openchat-7b", "name":"Openchat-7b", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
+{"model":"mistral-tiny", "name":"Mistral-Tiny", "inputPrice":0.03, "outputPrice":0.03, "maxContext":20000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
+{"model":"mistral-small", "name":"Mistral-small", "inputPrice":0.03, "outputPrice":0.03, "maxContext":20000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
+{"model":"pplx-7b-chat", "name":"pplx-7b-chat", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
+{"model":"openhermes-2.5-mistral-7b", "name":"openhermes-2.5-mistral-7b", "inputPrice":0.03, "outputPrice":0.03, "maxContext":3000, "maxResponse":500, "toolChoice":false, "functionPrompt":""}
   ],
   "qgModels": [
 {"model":"SparkDesk", "name":"SparkDesk", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":"800"},
@@ -133,7 +148,7 @@
 				"name": "检索重排-base",
 				"inputPrice": 0,
 				"requestUrl": "http://192.168.1.9:6006/api/v1/rerank",
-				"requestAuth": "xxxxxxx"
+				"requestAuth": "xxxxx"
 			}
 	],
   "audioSpeechModels": [
