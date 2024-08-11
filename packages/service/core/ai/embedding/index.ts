@@ -1,15 +1,17 @@
+import { VectorModelItemType } from '@fastgpt/global/core/ai/model.d';
 import { getAIApi } from '../config';
+import { countPromptTokens } from '../../../common/string/tiktoken/index';
+import { EmbeddingTypeEnm } from '@fastgpt/global/core/ai/constants';
+import { addLog } from '../../../common/system/log';
 
-export type GetVectorProps = {
-  model: string;
+type GetVectorProps = {
+  model: VectorModelItemType;
   input: string;
+  type?: `${EmbeddingTypeEnm}`;
 };
 
 // text to vector
-export async function getVectorsByText({
-  model = 'text-embedding-ada-002',
-  input
-}: GetVectorProps) {
+export async function getVectorsByText({ model, input, type }: GetVectorProps) {
   if (!input) {
     return Promise.reject({
       code: 500,
@@ -23,12 +25,16 @@ export async function getVectorsByText({
     // input text to vector
     const result = await ai.embeddings
       .create({
-        model,
+        ...model.defaultConfig,
+        ...(type === EmbeddingTypeEnm.db && model.dbConfig),
+        ...(type === EmbeddingTypeEnm.query && model.queryConfig),
+        model: model.model,
         input: [input]
       })
       .then(async (res) => {
         if (!res.data) {
-          return Promise.reject('Embedding API 404');
+          addLog.error('Embedding API is not responding', res);
+          return Promise.reject('Embedding API is not responding');
         }
         if (!res?.data?.[0]?.embedding) {
           console.log(res);
@@ -36,9 +42,14 @@ export async function getVectorsByText({
           return Promise.reject(res.data?.err?.message || 'Embedding API Error');
         }
 
+        const [tokens, vectors] = await Promise.all([
+          countPromptTokens(input),
+          Promise.all(res.data.map((item) => unityDimensional(item.embedding)))
+        ]);
+
         return {
-          charsLength: input.length,
-          vectors: await Promise.all(res.data.map((item) => unityDimensional(item.embedding)))
+          tokens,
+          vectors
         };
       });
 

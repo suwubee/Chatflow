@@ -1,22 +1,28 @@
-import type { ChatItemType } from '@fastgpt/global/core/chat/type.d';
+import type { AIChatItemType, UserChatItemType } from '@fastgpt/global/core/chat/type.d';
 import { MongoApp } from '@fastgpt/service/core/app/schema';
 import { ChatSourceEnum } from '@fastgpt/global/core/chat/constants';
 import { MongoChatItem } from '@fastgpt/service/core/chat/chatItemSchema';
 import { MongoChat } from '@fastgpt/service/core/chat/chatSchema';
 import { addLog } from '@fastgpt/service/common/system/log';
-import { chatContentReplaceBlock } from '@fastgpt/global/core/chat/utils';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { StoreNodeItemType } from '@fastgpt/global/core/workflow/type/node';
+import { getAppChatConfig, getGuideModule } from '@fastgpt/global/core/workflow/utils';
+import { AppChatConfigType } from '@fastgpt/global/core/app/type';
 
 type Props = {
   chatId: string;
   appId: string;
   teamId: string;
   tmbId: string;
+  nodes: StoreNodeItemType[];
+  appChatConfig?: AppChatConfigType;
   variables?: Record<string, any>;
-  updateUseTime: boolean;
+  isUpdateUseTime: boolean;
+  newTitle: string;
   source: `${ChatSourceEnum}`;
   shareId?: string;
   outLinkUid?: string;
-  content: [ChatItemType, ChatItemType];
+  content: [UserChatItemType & { dataId?: string }, AIChatItemType & { dataId?: string }];
   metadata?: Record<string, any>;
 };
 
@@ -25,8 +31,11 @@ export async function saveChat({
   appId,
   teamId,
   tmbId,
+  nodes,
+  appChatConfig,
   variables,
-  updateUseTime,
+  isUpdateUseTime,
+  newTitle,
   source,
   shareId,
   outLinkUid,
@@ -36,10 +45,8 @@ export async function saveChat({
   try {
     const chat = await MongoChat.findOne(
       {
-        chatId,
-        teamId,
-        tmbId,
-        appId
+        appId,
+        chatId
       },
       '_id metadata'
     );
@@ -48,61 +55,58 @@ export async function saveChat({
       ...chat?.metadata,
       ...metadata
     };
+    const { welcomeText, variables: variableList } = getAppChatConfig({
+      chatConfig: appChatConfig,
+      systemConfigNode: getGuideModule(nodes),
+      isPublicFetch: false
+    });
 
-    const promise: any[] = [
-      MongoChatItem.insertMany(
+    await mongoSessionRun(async (session) => {
+      await MongoChatItem.insertMany(
         content.map((item) => ({
           chatId,
           teamId,
           tmbId,
           appId,
           ...item
-        }))
-      )
-    ];
-
-    const title =
-      chatContentReplaceBlock(content[0].value).slice(0, 20) ||
-      content[1]?.value?.slice(0, 20) ||
-      'Chat';
-
-    if (chat) {
-      promise.push(
-        MongoChat.updateOne(
-          { appId, chatId },
-          {
-            title,
-            updateTime: new Date(),
-            metadata: metadataUpdate
-          }
-        )
+        })),
+        { session }
       );
-    } else {
-      promise.push(
-        MongoChat.create({
-          chatId,
-          teamId,
-          tmbId,
+
+      await MongoChat.updateOne(
+        {
           appId,
-          variables,
-          title,
-          source,
-          shareId,
-          outLinkUid,
-          metadata: metadataUpdate
-        })
+          chatId
+        },
+        {
+          $set: {
+            teamId,
+            tmbId,
+            appId,
+            chatId,
+            variableList,
+            welcomeText,
+            variables: variables || {},
+            title: newTitle,
+            source,
+            shareId,
+            outLinkUid,
+            metadata: metadataUpdate,
+            updateTime: new Date()
+          }
+        },
+        {
+          session,
+          upsert: true
+        }
       );
-    }
+    });
 
-    if (updateUseTime && source === ChatSourceEnum.online) {
-      promise.push(
-        MongoApp.findByIdAndUpdate(appId, {
-          updateTime: new Date()
-        })
-      );
+    if (isUpdateUseTime) {
+      await MongoApp.findByIdAndUpdate(appId, {
+        updateTime: new Date()
+      });
     }
-
-    await Promise.all(promise);
   } catch (error) {
     addLog.error(`update chat history error`, error);
   }

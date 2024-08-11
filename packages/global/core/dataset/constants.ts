@@ -2,23 +2,29 @@
 export enum DatasetTypeEnum {
   folder = 'folder',
   dataset = 'dataset',
-  websiteDataset = 'websiteDataset' // depp link
+  websiteDataset = 'websiteDataset', // depp link
+  externalFile = 'externalFile'
 }
 export const DatasetTypeMap = {
   [DatasetTypeEnum.folder]: {
     icon: 'common/folderFill',
-    label: 'core.dataset.Folder Dataset',
+    label: 'folder_dataset',
     collectionLabel: 'common.Folder'
   },
   [DatasetTypeEnum.dataset]: {
     icon: 'core/dataset/commonDataset',
-    label: 'core.dataset.Common Dataset',
+    label: 'common_dataset',
     collectionLabel: 'common.File'
   },
   [DatasetTypeEnum.websiteDataset]: {
     icon: 'core/dataset/websiteDataset',
-    label: 'core.dataset.Website Dataset',
+    label: 'website_dataset',
     collectionLabel: 'common.Website'
+  },
+  [DatasetTypeEnum.externalFile]: {
+    icon: 'core/dataset/externalDataset',
+    label: 'external_file',
+    collectionLabel: 'common.File'
   }
 };
 
@@ -38,9 +44,11 @@ export const DatasetStatusMap = {
 /* ------------ collection -------------- */
 export enum DatasetCollectionTypeEnum {
   folder = 'folder',
+  virtual = 'virtual',
+
   file = 'file',
   link = 'link', // one link
-  virtual = 'virtual'
+  externalFile = 'externalFile'
 }
 export const DatasetCollectionTypeMap = {
   [DatasetCollectionTypeEnum.folder]: {
@@ -48,6 +56,9 @@ export const DatasetCollectionTypeMap = {
   },
   [DatasetCollectionTypeEnum.file]: {
     name: 'core.dataset.file'
+  },
+  [DatasetCollectionTypeEnum.externalFile]: {
+    name: 'core.dataset.externalFile'
   },
   [DatasetCollectionTypeEnum.link]: {
     name: 'core.dataset.link'
@@ -71,45 +82,37 @@ export const DatasetCollectionSyncResultMap = {
 };
 
 /* ------------ data -------------- */
-export enum DatasetDataIndexTypeEnum {
-  chunk = 'chunk',
-  qa = 'qa',
-  summary = 'summary',
-  hypothetical = 'hypothetical',
-  custom = 'custom'
-}
-export const DatasetDataIndexTypeMap = {
-  [DatasetDataIndexTypeEnum.chunk]: {
-    name: 'dataset.data.indexes.chunk'
-  },
-  [DatasetDataIndexTypeEnum.summary]: {
-    name: 'dataset.data.indexes.summary'
-  },
-  [DatasetDataIndexTypeEnum.hypothetical]: {
-    name: 'dataset.data.indexes.hypothetical'
-  },
-  [DatasetDataIndexTypeEnum.qa]: {
-    name: 'dataset.data.indexes.qa'
-  },
-  [DatasetDataIndexTypeEnum.custom]: {
-    name: 'dataset.data.indexes.custom'
-  }
-};
 
 /* ------------ training -------------- */
+export enum ImportDataSourceEnum {
+  fileLocal = 'fileLocal',
+  fileLink = 'fileLink',
+  fileCustom = 'fileCustom',
+  csvTable = 'csvTable',
+  externalFile = 'externalFile'
+}
+
 export enum TrainingModeEnum {
   chunk = 'chunk',
+  auto = 'auto',
   qa = 'qa'
 }
 
 export const TrainingTypeMap = {
   [TrainingModeEnum.chunk]: {
     label: 'core.dataset.training.Chunk mode',
-    tooltip: 'core.dataset.import.Chunk Split Tip'
+    tooltip: 'core.dataset.import.Chunk Split Tip',
+    openSource: true
+  },
+  [TrainingModeEnum.auto]: {
+    label: 'core.dataset.training.Auto mode',
+    tooltip: 'core.dataset.training.Auto mode Tip',
+    openSource: false
   },
   [TrainingModeEnum.qa]: {
     label: 'core.dataset.training.QA mode',
-    tooltip: 'core.dataset.import.QA Import Tip'
+    tooltip: 'core.dataset.import.QA Import Tip',
+    openSource: true
   }
 };
 
@@ -170,8 +173,12 @@ export const SearchScoreTypeMap = {
   }
 };
 
-export const FolderIcon = 'file/fill/folder';
-export const FolderImgUrl = '/imgs/files/folder.svg';
-
 export const CustomCollectionIcon = 'common/linkBlue';
 export const LinkCollectionIcon = 'common/linkBlue';
+
+/* source prefix */
+export enum DatasetSourceReadTypeEnum {
+  fileLocal = 'fileLocal',
+  link = 'link',
+  externalFile = 'externalFile'
+}

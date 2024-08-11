@@ -1,6 +1,10 @@
-import type { ChatItemType } from '@fastgpt/global/core/chat/type';
+import type { ChatItemType, ChatItemValueItemType } from '@fastgpt/global/core/chat/type';
 import { MongoChatItem } from './chatItemSchema';
 import { addLog } from '../../common/system/log';
+import { ChatItemValueTypeEnum } from '@fastgpt/global/core/chat/constants';
+import { delFileByFileIdList, getGFSCollection } from '../../common/file/gridfs/controller';
+import { BucketNameEnum } from '@fastgpt/global/common/file/constants';
+import { MongoChat } from './chatSchema';
 
 export async function getChatItems({
   appId,
@@ -12,20 +16,39 @@ export async function getChatItems({
   chatId?: string;
   limit?: number;
   field: string;
-}): Promise<{ history: ChatItemType[] }> {
+}): Promise<{ histories: ChatItemType[] }> {
   if (!chatId) {
-    return { history: [] };
+    return { histories: [] };
   }
 
-  const history = await MongoChatItem.find({ appId, chatId }, field)
+  const histories = await MongoChatItem.find({ appId, chatId }, field)
     .sort({ _id: -1 })
     .limit(limit)
     .lean();
 
-  history.reverse();
+  histories.reverse();
 
-  return { history };
+  histories.forEach((item) => {
+    // @ts-ignore
+    item.value = adaptStringValue(item.value);
+  });
+
+  return { histories };
 }
+/* 临时适配旧的对话记录 */
+export const adaptStringValue = (value: any): ChatItemValueItemType[] => {
+  if (typeof value === 'string') {
+    return [
+      {
+        type: ChatItemValueTypeEnum.text,
+        text: {
+          content: value
+        }
+      }
+    ];
+  }
+  return value;
+};
 
 export const addCustomFeedbacks = async ({
   appId,
@@ -43,6 +66,7 @@ export const addCustomFeedbacks = async ({
   try {
     await MongoChatItem.findOneAndUpdate(
       {
+        appId,
         chatId,
         dataId: chatItemId
       },
@@ -53,4 +77,41 @@ export const addCustomFeedbacks = async ({
   } catch (error) {
     addLog.error('addCustomFeedbacks error', error);
   }
+};
+
+/* 
+  Delete chat files
+  1. ChatId: Delete one chat files
+  2. AppId: Delete all the app's chat files
+*/
+export const deleteChatFiles = async ({
+  chatIdList,
+  appId
+}: {
+  chatIdList?: string[];
+  appId?: string;
+}) => {
+  if (!appId && !chatIdList) return Promise.reject('appId or chatIdList is required');
+
+  const appChatIdList = await (async () => {
+    if (appId) {
+      const appChatIdList = await MongoChat.find({ appId }, { chatId: 1 });
+      return appChatIdList.map((item) => String(item.chatId));
+    } else if (chatIdList) {
+      return chatIdList;
+    }
+    return [];
+  })();
+
+  const collection = getGFSCollection(BucketNameEnum.chat);
+  const where = {
+    'metadata.chatId': { $in: appChatIdList }
+  };
+
+  const files = await collection.find(where, { projection: { _id: 1 } }).toArray();
+
+  await delFileByFileIdList({
+    bucketName: BucketNameEnum.chat,
+    fileIdList: files.map((item) => String(item._id))
+  });
 };

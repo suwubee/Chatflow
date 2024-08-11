@@ -1,5 +1,7 @@
+### Chatflow v1.2 20240811
+* 更新FastGPT v4.8.8正式版
 ### Chatflow v1.1 20240125
-* 更新FastGPT v4.6.67正式版
+* 更新FastGPT v4.6.7正式版
 ### Chatflow v1.01 20240109
 * 更新FastGPT v4.6.6正式版
 ### Chatflow v1.0 20240104

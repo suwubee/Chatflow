@@ -1,3 +1,4 @@
+// 已使用 json5 进行解析，会自动去掉注释，无需手动去除
 {
   "feConfigs": {
     "isPlus": false,
@@ -22,123 +23,136 @@
 	"baseUrl":"https://chatapi.aisws.com/v1/"
   },
   "systemEnv": {
-    "openapiPrefix": "fastgpt",
     "vectorMaxProcess": 15,
     "qaMaxProcess": 15,
-    "pgHNSWEfSearch": 100
+    "pgHNSWEfSearch": 100 // 向量搜索参数。越大，搜索越精确，但是速度越慢。设置为100，有99%+精度。
   },
-  "chatModels": [
-{"model":"SparkDesk", "name":"SparkDesk", "inputPrice":0.03, "outputPrice":0.03, "maxContext":6000, "maxResponse":6000, "quoteMaxToken":4000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"chatglm_turbo", "name":"chatglm_turbo", "inputPrice":0.01, "outputPrice":0.005, "maxContext":30000, "maxResponse":30000, "quoteMaxToken":16000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"gpt-3.5-turbo", "name":"AIS35", "inputPrice":0.01, "outputPrice":0.02, "maxContext":7000, "maxResponse":7000, "quoteMaxToken":3000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"gpt-3.5-turbo-1106", "name":"AIS35-16k", "inputPrice":0.01, "outputPrice":0.02, "maxContext":12000, "maxResponse":12000, "quoteMaxToken":6000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"gpt-4", "name":"AIS4-8k", "inputPrice":0.30, "outputPrice":0.6, "maxContext":6000, "maxResponse":6000, "quoteMaxToken":3000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"gpt-4-32k", "name":"AIS4-32k", "inputPrice":0.60, "outputPrice":1.2, "maxContext":30000, "maxResponse":30000, "quoteMaxToken":12000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"gpt-4-vision-preview", "name":"AIS4-Vision", "inputPrice":0.10, "outputPrice":0.3, "maxContext":120000, "maxResponse":4000, "quoteMaxToken":30000, "maxTemperature":1.2, "censor":false, "vision":true, "defaultSystemChatPrompt":""},
-{"model":"claude-2", "name":"Ais Claude2", "inputPrice":0.08, "outputPrice":0.2, "maxContext":200000, "maxResponse":180000, "quoteMaxToken":100000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"mixtral-8x7b", "name":"Ais-Mixtral-8x7b", "inputPrice":0.01, "outputPrice":0.008, "maxContext":30000, "maxResponse":30000, "quoteMaxToken":4000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"gemini-pro", "name":"Ais-GemPro", "inputPrice":0.00, "outputPrice":0.006, "maxContext":120000, "maxResponse":120000, "quoteMaxToken":30000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"aisws-gpt-3.5-turbo", "name":"AIS35-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":7000, "maxResponse":7000, "quoteMaxToken":4000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"aisws-gpt-3.5-turbo-1106", "name":"AIS35-16k-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":12000, "maxResponse":12000, "quoteMaxToken":8000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"aisws-gpt-4-turbo-preview", "name":"AIS4-turbo-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":120000, "maxResponse":4000, "quoteMaxToken":30000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"aisws-gpt-4-vision-preview", "name":"AIS4-Vision-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":120000, "maxResponse":4000, "quoteMaxToken":30000, "maxTemperature":1.2, "censor":false, "vision":true, "defaultSystemChatPrompt":""},
-{"model":"openchat-7b", "name":"Openchat-7b", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":7000, "quoteMaxToken":4000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"mistral-tiny", "name":"Mistral-Tiny", "inputPrice":0.03, "outputPrice":0.03, "maxContext":20000, "maxResponse":30000, "quoteMaxToken":4000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"mistral-small", "name":"Mistral-small", "inputPrice":0.03, "outputPrice":0.03, "maxContext":20000, "maxResponse":30000, "quoteMaxToken":4000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"pplx-7b-chat", "name":"pplx-7b-chat", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":7000, "quoteMaxToken":4000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""},
-{"model":"openhermes-2.5-mistral-7b", "name":"openhermes-2.5-mistral-7b", "inputPrice":0.03, "outputPrice":0.03, "maxContext":3000, "maxResponse":3000, "quoteMaxToken":4000, "maxTemperature":1.2, "censor":false, "vision":false, "defaultSystemChatPrompt":""}
-  ],
-  "qaModels": [
-{"model":"SparkDesk", "name":"SparkDesk", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":"7000"},
-{"model":"chatglm_turbo", "name":"chatglm_turbo", "inputPrice":0.01, "outputPrice":0.005, "maxContext":30000, "maxResponse":"30000"},
-{"model":"gpt-3.5-turbo", "name":"AIS35", "inputPrice":0.01, "outputPrice":0.02, "maxContext":7000, "maxResponse":"7000"},
-{"model":"gpt-3.5-turbo-1106", "name":"AIS35-16k", "inputPrice":0.01, "outputPrice":0.02, "maxContext":12000, "maxResponse":"12000"},
-{"model":"gpt-4", "name":"AIS4-8k", "inputPrice":0.30, "outputPrice":0.6, "maxContext":7000, "maxResponse":7000},
-{"model":"gpt-4-32k", "name":"AIS4-32k", "inputPrice":0.60, "outputPrice":1.2, "maxContext":30000, "maxResponse":"30000"},
-{"model":"gpt-4-vision-preview", "name":"AIS4-Vision", "inputPrice":0.10, "outputPrice":0.3, "maxContext":120000, "maxResponse":"3000"},
-{"model":"claude-2", "name":"Ais Claude2", "inputPrice":0.08, "outputPrice":0.2, "maxContext":180000, "maxResponse":"180000"},
-{"model":"mixtral-8x7b", "name":"Ais-Mixtral-8x7b", "inputPrice":0.01, "outputPrice":0.008, "maxContext":30000, "maxResponse":"30000"},
-{"model":"gemini-pro", "name":"Ais-GemPro", "inputPrice":0.00, "outputPrice":0.006, "maxContext":100000, "maxResponse":"100000"},
-{"model":"aisws-gpt-3.5-turbo", "name":"AIS35-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":7000, "maxResponse":"7000"},
-{"model":"aisws-gpt-3.5-turbo-1106", "name":"AIS35-16k-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":12000, "maxResponse":"12000"},
-{"model":"aisws-gpt-4-turbo-preview", "name":"AIS4-turbo-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":120000, "maxResponse":"3000"},
-{"model":"aisws-gpt-4-vision-preview", "name":"AIS4-Vision-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":120000, "maxResponse":"3000"}
-  ],
-  "cqModels": [
-{"model":"SparkDesk", "name":"SparkDesk", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"chatglm_turbo", "name":"chatglm_turbo", "inputPrice":0.01, "outputPrice":0.005, "maxContext":30000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"gpt-3.5-turbo", "name":"AIS35", "inputPrice":0.01, "outputPrice":0.02, "maxContext":7000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"gpt-3.5-turbo-1106", "name":"AIS35-16k", "inputPrice":0.01, "outputPrice":0.02, "maxContext":12000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"gpt-4", "name":"AIS4-8k", "inputPrice":0.30, "outputPrice":0.6, "maxContext":7000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"gpt-4-32k", "name":"AIS4-32k", "inputPrice":0.60, "outputPrice":1.2, "maxContext":30000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"gpt-4-vision-preview", "name":"AIS4-Vision", "inputPrice":0.10, "outputPrice":0.3, "maxContext":100000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"claude-2", "name":"Ais Claude2", "inputPrice":0.08, "outputPrice":0.2, "maxContext":180000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"mixtral-8x7b", "name":"Ais-Mixtral-8x7b", "inputPrice":0.01, "outputPrice":0.008, "maxContext":30000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"gemini-pro", "name":"Ais-GemPro", "inputPrice":0.00, "outputPrice":0.006, "maxContext":100000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"aisws-gpt-3.5-turbo", "name":"AIS35-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":7000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"aisws-gpt-3.5-turbo-1106", "name":"AIS35-16k-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":12000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"aisws-gpt-4-turbo-preview", "name":"AIS4-turbo-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":100000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"aisws-gpt-4-vision-preview", "name":"AIS4-Vision-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":100000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"openchat-7b", "name":"Openchat-7b", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
-{"model":"mistral-tiny", "name":"Mistral-Tiny", "inputPrice":0.03, "outputPrice":0.03, "maxContext":20000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
-{"model":"mistral-small", "name":"Mistral-small", "inputPrice":0.03, "outputPrice":0.03, "maxContext":20000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
-{"model":"pplx-7b-chat", "name":"pplx-7b-chat", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
-{"model":"openhermes-2.5-mistral-7b", "name":"openhermes-2.5-mistral-7b", "inputPrice":0.03, "outputPrice":0.03, "maxContext":30000, "maxResponse":500, "toolChoice":false, "functionPrompt":""}
-  ],
-  "extractModels": [
-{"model":"SparkDesk", "name":"SparkDesk", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":500, "toolChoice":true, "functionPrompt":""},
-{"model":"chatglm_turbo", "name":"chatglm_turbo", "inputPrice":0.01, "outputPrice":0.005, "maxContext":30000, "maxResponse":500, "toolChoice":true, "functionPrompt":""},
-{"model":"gpt-3.5-turbo", "name":"AIS35", "inputPrice":0.01, "outputPrice":0.02, "maxContext":7000, "maxResponse":500, "toolChoice":true, "functionPrompt":""},
-{"model":"gpt-3.5-turbo-1106", "name":"AIS35-16k", "inputPrice":0.01, "outputPrice":0.02, "maxContext":7000, "maxResponse":500, "toolChoice":true, "functionPrompt":""},
-{"model":"gpt-4", "name":"AIS4-8k", "inputPrice":0.30, "outputPrice":0.6, "maxContext":7000, "maxResponse":500, "toolChoice":true, "functionPrompt":""},
-{"model":"gpt-4-32k", "name":"AIS4-32k", "inputPrice":0.60, "outputPrice":1.2, "maxContext":7000, "maxResponse":500, "toolChoice":true, "functionPrompt":""},
-{"model":"gpt-4-vision-preview", "name":"AIS4-Vision", "inputPrice":0.10, "outputPrice":0.3, "maxContext":12000, "maxResponse":500, "toolChoice":true, "functionPrompt":""},
-{"model":"claude-2", "name":"Ais Claude2", "inputPrice":0.08, "outputPrice":0.2, "maxContext":20000, "maxResponse":500, "toolChoice":true, "functionPrompt":""},
-{"model":"mixtral-8x7b", "name":"Ais-Mixtral-8x7b", "inputPrice":0.01, "outputPrice":0.008, "maxContext":3000, "maxResponse":500, "toolChoice":true, "functionPrompt":""},
-{"model":"gemini-pro", "name":"Ais-GemPro", "inputPrice":0.00, "outputPrice":0.006, "maxContext":8000, "maxResponse":500, "toolChoice":true, "functionPrompt":""},
-{"model":"aisws-gpt-3.5-turbo", "name":"AIS35-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":7000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"aisws-gpt-3.5-turbo-1106", "name":"AIS35-16k-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":12000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"aisws-gpt-4-turbo-preview", "name":"AIS4-turbo-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":100000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"aisws-gpt-4-vision-preview", "name":"AIS4-Vision-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":100000, "maxResponse":1000, "toolChoice":true, "functionPrompt":""},
-{"model":"openchat-7b", "name":"Openchat-7b", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
-{"model":"mistral-tiny", "name":"Mistral-Tiny", "inputPrice":0.03, "outputPrice":0.03, "maxContext":20000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
-{"model":"mistral-small", "name":"Mistral-small", "inputPrice":0.03, "outputPrice":0.03, "maxContext":20000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
-{"model":"pplx-7b-chat", "name":"pplx-7b-chat", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":500, "toolChoice":false, "functionPrompt":""},
-{"model":"openhermes-2.5-mistral-7b", "name":"openhermes-2.5-mistral-7b", "inputPrice":0.03, "outputPrice":0.03, "maxContext":3000, "maxResponse":500, "toolChoice":false, "functionPrompt":""}
-  ],
-  "qgModels": [
-{"model":"SparkDesk", "name":"SparkDesk", "inputPrice":0.03, "outputPrice":0.03, "maxContext":7000, "maxResponse":"800"},
-{"model":"chatglm_turbo", "name":"chatglm_turbo", "inputPrice":0.01, "outputPrice":0.005, "maxContext":30000, "maxResponse":"32000"},
-{"model":"gpt-3.5-turbo", "name":"AIS35", "inputPrice":0.01, "outputPrice":0.02, "maxContext":7000, "maxResponse":"800"},
-{"model":"gpt-3.5-turbo-1106", "name":"AIS35-16k", "inputPrice":0.01, "outputPrice":0.02, "maxContext":8000, "maxResponse":"800"},
-{"model":"gpt-4", "name":"AIS4-8k", "inputPrice":0.30, "outputPrice":0.6, "maxContext":7000, "maxResponse":"800"},
-{"model":"gpt-4-32k", "name":"AIS4-32k", "inputPrice":0.60, "outputPrice":1.2, "maxContext":20000, "maxResponse":"800"},
-{"model":"gpt-4-vision-preview", "name":"AIS4-Vision", "inputPrice":0.10, "outputPrice":0.3, "maxContext":28000, "maxResponse":"800"},
-{"model":"claude-2", "name":"Ais Claude2", "inputPrice":0.08, "outputPrice":0.2, "maxContext":200000, "maxResponse":"800"},
-{"model":"mixtral-8x7b", "name":"Ais-Mixtral-8x7b", "inputPrice":0.01, "outputPrice":0.008, "maxContext":20000, "maxResponse":"800"},
-{"model":"gemini-pro", "name":"Ais-GemPro", "inputPrice":0.00, "outputPrice":0.006, "maxContext":40000, "maxResponse":"800"},
-{"model":"aisws-gpt-3.5-turbo", "name":"AIS35-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":7000, "maxResponse":"800"},
-{"model":"aisws-gpt-3.5-turbo-1106", "name":"AIS35-16k-new", "inputPrice":0.01, "outputPrice":0.02, "maxContext":8000, "maxResponse":"800"},
-{"model":"aisws-gpt-4-turbo-preview", "name":"AIS4-turbo-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":28000, "maxResponse":"800"},
-{"model":"aisws-gpt-4-vision-preview", "name":"AIS4-Vision-new", "inputPrice":0.10, "outputPrice":0.3, "maxContext":28000, "maxResponse":"800"}
+  "llmModels": [
+    {
+      "model": "gpt-4o-mini", // 模型名(对应OneAPI中渠道的模型名)
+      "name": "gpt-4o-mini", // 模型别名
+      "avatar": "/imgs/model/openai.svg", // 模型的logo
+      "maxContext": 125000, // 最大上下文
+      "maxResponse": 4000, // 最大回复
+      "quoteMaxToken": 120000, // 最大引用内容
+      "maxTemperature": 1.2, // 最大温度
+      "charsPointsPrice": 0, // n积分/1k token（商业版）
+      "censor": false, // 是否开启敏感校验（商业版）
+      "vision": true, // 是否支持图片输入
+      "datasetProcess": true, // 是否设置为知识库处理模型（QA），务必保证至少有一个为true，否则知识库会报错
+      "usedInClassify": true, // 是否用于问题分类（务必保证至少有一个为true）
+      "usedInExtractFields": true, // 是否用于内容提取（务必保证至少有一个为true）
+      "usedInToolCall": true, // 是否用于工具调用（务必保证至少有一个为true）
+      "usedInQueryExtension": true, // 是否用于问题优化（务必保证至少有一个为true）
+      "toolChoice": true, // 是否支持工具选择（分类，内容提取，工具调用会用到。目前只有gpt支持）
+      "functionCall": true, // 是否支持函数调用（分类，内容提取，工具调用会用到。会优先使用 toolChoice，如果为false，则使用 functionCall，如果仍为 false，则使用提示词模式）
+      "customCQPrompt": "", // 自定义文本分类提示词（不支持工具和函数调用的模型
+      "customExtractPrompt": "", // 自定义内容提取提示词
+      "defaultSystemChatPrompt": "", // 对话默认携带的系统提示词
+      "defaultConfig": {} // 请求API时，挟带一些默认配置（比如 GLM4 的 top_p）
+    },
+    {
+      "model": "gpt-4o",
+      "name": "gpt-4o",
+      "avatar": "/imgs/model/openai.svg",
+      "maxContext": 125000,
+      "maxResponse": 4000,
+      "quoteMaxToken": 120000,
+      "maxTemperature": 1.2,
+      "charsPointsPrice": 0,
+      "censor": false,
+      "vision": true,
+      "datasetProcess": false,
+      "usedInClassify": true,
+      "usedInExtractFields": true,
+      "usedInToolCall": true,
+      "usedInQueryExtension": true,
+      "toolChoice": true,
+      "functionCall": true,
+      "customCQPrompt": "",
+      "customExtractPrompt": "",
+      "defaultSystemChatPrompt": "",
+      "defaultConfig": {}
+    },
+    {
+      "model": "gpt-4o-mini-lite", // 模型名(对应OneAPI中渠道的模型名)
+      "name": "gpt-4o-mini-lite", // 模型别名
+      "avatar": "/imgs/model/openai.svg", // 模型的logo
+      "maxContext": 125000, // 最大上下文
+      "maxResponse": 4000, // 最大回复
+      "quoteMaxToken": 120000, // 最大引用内容
+      "maxTemperature": 1.2, // 最大温度
+      "charsPointsPrice": 0, // n积分/1k token（商业版）
+      "censor": false, // 是否开启敏感校验（商业版）
+      "vision": true, // 是否支持图片输入
+      "datasetProcess": true, // 是否设置为知识库处理模型（QA），务必保证至少有一个为true，否则知识库会报错
+      "usedInClassify": false, // 是否用于问题分类（务必保证至少有一个为true）
+      "usedInExtractFields": false, // 是否用于内容提取（务必保证至少有一个为true）
+      "usedInToolCall": false, // 是否用于工具调用（务必保证至少有一个为true）
+      "usedInQueryExtension": true, // 是否用于问题优化（务必保证至少有一个为true）
+      "toolChoice": false, // 是否支持工具选择（分类，内容提取，工具调用会用到。目前只有gpt支持）
+      "functionCall": false, // 是否支持函数调用（分类，内容提取，工具调用会用到。会优先使用 toolChoice，如果为false，则使用 functionCall，如果仍为 false，则使用提示词模式）
+      "customCQPrompt": "", // 自定义文本分类提示词（不支持工具和函数调用的模型
+      "customExtractPrompt": "", // 自定义内容提取提示词
+      "defaultSystemChatPrompt": "", // 对话默认携带的系统提示词
+      "defaultConfig": {} // 请求API时，挟带一些默认配置（比如 GLM4 的 top_p）
+    },
+    {
+      "model": "gpt-4o-lite",
+      "name": "gpt-4o-lite",
+      "avatar": "/imgs/model/openai.svg",
+      "maxContext": 125000,
+      "maxResponse": 4000,
+      "quoteMaxToken": 120000,
+      "maxTemperature": 1.2,
+      "charsPointsPrice": 0,
+      "censor": false,
+      "vision": true,
+      "datasetProcess": false,
+      "usedInClassify": false,
+      "usedInExtractFields": false,
+      "usedInToolCall": false,
+      "usedInQueryExtension": true,
+      "toolChoice": false,
+      "functionCall": false,
+      "customCQPrompt": "",
+      "customExtractPrompt": "",
+      "defaultSystemChatPrompt": "",
+      "defaultConfig": {}
+    }
   ],
   "vectorModels": [
     {
-      "model": "text-embedding-ada-002",
-      "name": "Embedding-2",
-      "inputPrice": 0,
-      "outputPrice": 0,
-      "defaultToken": 1000,
-      "maxToken": 7000,
-      "weight": 100
+      "model": "text-embedding-ada-002", // 模型名（与OneAPI对应）
+      "name": "Embedding-2", // 模型展示名
+      "avatar": "/imgs/model/openai.svg", // logo
+      "charsPointsPrice": 0, // n积分/1k token
+      "defaultToken": 700, // 默认文本分割时候的 token
+      "maxToken": 3000, // 最大 token
+      "weight": 100, // 优先训练权重
+      "defaultConfig": {}, // 自定义额外参数。例如，如果希望使用 embedding3-large 的话，可以传入 dimensions:1024，来返回1024维度的向量。（目前必须小于1536维度）
+      "dbConfig": {}, // 存储时的额外参数（非对称向量模型时候需要用到）
+      "queryConfig": {} // 参训时的额外参数
     },
     {
       "model": "text-embedding-3-large",
-      "name": "Embedding-3L",
-      "inputPrice": 0,
-      "outputPrice": 0,
-      "defaultToken": 1000,
-      "maxToken": 7000,
+      "name": "text-embedding-3-large",
+      "avatar": "/imgs/model/openai.svg",
+      "charsPointsPrice": 0,
+      "defaultToken": 512,
+      "maxToken": 3000,
+      "weight": 100,
+      "defaultConfig": {
+        "dimensions": 1024
+      }
+    },
+    {
+      "model": "text-embedding-3-small",
+      "name": "text-embedding-3-small",
+      "avatar": "/imgs/model/openai.svg",
+      "charsPointsPrice": 0,
+      "defaultToken": 512,
+      "maxToken": 3000,
       "weight": 100
     }
   ],
@@ -155,8 +169,7 @@
     {
       "model": "tts-1",
       "name": "OpenAI TTS1",
-      "inputPrice": 0,
-      "outputPrice": 0,
+      "charsPointsPrice": 0,
       "voices": [
         { "label": "Alloy", "value": "alloy", "bufferId": "openai-Alloy" },
         { "label": "Echo", "value": "echo", "bufferId": "openai-Echo" },
@@ -170,7 +183,6 @@
   "whisperModel": {
     "model": "whisper-1",
     "name": "Whisper1",
-    "inputPrice": 0,
-    "outputPrice": 0
+    "charsPointsPrice": 0
   }
 }

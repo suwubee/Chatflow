@@ -1,7 +1,11 @@
 import { CollectionWithDatasetType, DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
 import { MongoDatasetCollection } from './collection/schema';
 import { MongoDataset } from './schema';
-import { delCollectionAndRelatedSources } from './collection/controller';
+import { delCollectionRelatedSource } from './collection/controller';
+import { ClientSession } from '../../common/mongo';
+import { MongoDatasetTraining } from './training/schema';
+import { MongoDatasetData } from './data/schema';
+import { deleteDatasetDataVector } from '../../common/vectorStore/controller';
 
 /* ============= dataset ========== */
 /* find all datasetId by top datasetId */
@@ -33,7 +37,7 @@ export async function findDatasetAndAllChildren({
     return datasets;
   };
   const [dataset, childDatasets] = await Promise.all([
-    MongoDataset.findById(datasetId),
+    MongoDataset.findById(datasetId).lean(),
     find(datasetId)
   ]);
 
@@ -55,10 +59,21 @@ export async function getCollectionWithDataset(collectionId: string) {
 }
 
 /* delete all data by datasetIds */
-export async function delDatasetRelevantData({ datasets }: { datasets: DatasetSchemaType[] }) {
+export async function delDatasetRelevantData({
+  datasets,
+  session
+}: {
+  datasets: DatasetSchemaType[];
+  session: ClientSession;
+}) {
   if (!datasets.length) return;
 
   const teamId = datasets[0].teamId;
+
+  if (!teamId) {
+    return Promise.reject('teamId is required');
+  }
+
   const datasetIds = datasets.map((item) => String(item._id));
 
   // Get _id, teamId, fileId, metadata.relatedImgId for all collections
@@ -67,8 +82,30 @@ export async function delDatasetRelevantData({ datasets }: { datasets: DatasetSc
       teamId,
       datasetId: { $in: datasetIds }
     },
-    '_id teamId fileId metadata'
+    '_id teamId datasetId fileId metadata'
   ).lean();
 
-  await delCollectionAndRelatedSources({ collections });
+  // delete training data
+  await MongoDatasetTraining.deleteMany({
+    teamId,
+    datasetId: { $in: datasetIds }
+  });
+
+  // image and file
+  await delCollectionRelatedSource({ collections, session });
+
+  // delete dataset.datas
+  await MongoDatasetData.deleteMany({ teamId, datasetId: { $in: datasetIds } }, { session });
+
+  // delete collections
+  await MongoDatasetCollection.deleteMany(
+    {
+      teamId,
+      datasetId: { $in: datasetIds }
+    },
+    { session }
+  );
+
+  // no session delete: delete files, vector data
+  await deleteDatasetDataVector({ teamId, datasetIds });
 }

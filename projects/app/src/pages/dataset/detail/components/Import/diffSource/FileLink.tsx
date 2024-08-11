@@ -1,38 +1,43 @@
 import React, { useEffect } from 'react';
-import { ImportDataComponentProps } from '@/web/core/dataset/type.d';
-
 import dynamic from 'next/dynamic';
-import { useImportStore } from '../Provider';
 import { useTranslation } from 'next-i18next';
 import { useForm } from 'react-hook-form';
 import { Box, Button, Flex, Input, Link, Textarea } from '@chakra-ui/react';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { LinkCollectionIcon } from '@fastgpt/global/core/dataset/constants';
-import { feConfigs } from '@/web/common/system/staticData';
+import { useSystemStore } from '@/web/common/system/useSystemStore';
 import { getDocPath } from '@/web/common/system/doc';
-import Loading from '@/components/Loading';
+import Loading from '@fastgpt/web/components/common/MyLoading';
+import { useContextSelector } from 'use-context-selector';
+import { DatasetImportContext } from '../Context';
 
 const DataProcess = dynamic(() => import('../commonProgress/DataProcess'), {
   loading: () => <Loading fixed={false} />
 });
 const Upload = dynamic(() => import('../commonProgress/Upload'));
 
-const LinkCollection = ({ activeStep, goToNext }: ImportDataComponentProps) => {
+const LinkCollection = () => {
+  const activeStep = useContextSelector(DatasetImportContext, (v) => v.activeStep);
+
   return (
     <>
-      {activeStep === 0 && <CustomLinkImport goToNext={goToNext} />}
-      {activeStep === 1 && <DataProcess showPreviewChunks={false} goToNext={goToNext} />}
-      {activeStep === 2 && <Upload showPreviewChunks={false} />}
+      {activeStep === 0 && <CustomLinkImport />}
+      {activeStep === 1 && <DataProcess showPreviewChunks />}
+      {activeStep === 2 && <Upload />}
     </>
   );
 };
 
 export default React.memo(LinkCollection);
 
-const CustomLinkImport = ({ goToNext }: { goToNext: () => void }) => {
+const CustomLinkImport = () => {
   const { t } = useTranslation();
-  const { sources, setSources, processParamsForm } = useImportStore();
+  const { feConfigs } = useSystemStore();
+  const { goToNext, sources, setSources, processParamsForm } = useContextSelector(
+    DatasetImportContext,
+    (v) => v
+  );
   const { register, reset, handleSubmit, watch } = useForm({
     defaultValues: {
       link: ''
@@ -55,13 +60,13 @@ const CustomLinkImport = ({ goToNext }: { goToNext: () => void }) => {
     <Box maxW={['100%', '800px']}>
       <Box display={['block', 'flex']} alignItems={'flex-start'} mt={1}>
         <Box flex={'0 0 100px'} fontSize={'sm'}>
-          {t('core.dataset.import.Link name')}
+          {t('common:core.dataset.import.Link name')}
         </Box>
         <Textarea
           flex={'1 0 0'}
           w={'100%'}
           rows={10}
-          placeholder={t('core.dataset.import.Link name placeholder')}
+          placeholder={t('common:core.dataset.import.Link name placeholder')}
           bg={'myGray.50'}
           overflowX={'auto'}
           whiteSpace={'nowrap'}
@@ -72,11 +77,11 @@ const CustomLinkImport = ({ goToNext }: { goToNext: () => void }) => {
       </Box>
       <Box display={['block', 'flex']} alignItems={'center'} mt={4}>
         <Box flex={'0 0 100px'} fontSize={'sm'}>
-          {t('core.dataset.website.Selector')}
+          {t('common:core.dataset.website.Selector')}
           <Box color={'myGray.500'} fontSize={'sm'}>
             {feConfigs?.docUrl && (
               <Link href={getDocPath('/docs/course/websync/#选择器如何使用')} target="_blank">
-                {t('core.dataset.website.Selector Course')}
+                {t('common:core.dataset.website.Selector Course')}
               </Link>
             )}
           </Box>
@@ -127,10 +132,8 @@ const CustomLinkImport = ({ goToNext }: { goToNext: () => void }) => {
             setSources(
               newLinkList.map((link) => ({
                 id: getNanoid(32),
+                createStatus: 'waiting',
                 link,
-                rawText: '',
-                chunks: [],
-                chunkChars: 0,
                 sourceName: link,
                 icon: LinkCollectionIcon
               }))
@@ -139,7 +142,7 @@ const CustomLinkImport = ({ goToNext }: { goToNext: () => void }) => {
             goToNext();
           })}
         >
-          {t('common.Next Step')}
+          {t('common:common.Next Step')}
         </Button>
       </Flex>
     </Box>

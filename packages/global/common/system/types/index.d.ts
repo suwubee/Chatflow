@@ -1,3 +1,4 @@
+import { StandSubPlanLevelMapType, SubPlanType } from '../../../support/wallet/sub/type';
 import type {
   ChatModelItemType,
   FunctionModelItemType,
@@ -7,16 +8,14 @@ import type {
   WhisperModelType,
   ReRankModelItemType
 } from '../../../core/ai/model.d';
+import { SubTypeEnum } from '../../../support/wallet/sub/constants';
 
 /* fastgpt main */
 export type FastGPTConfigFileType = {
   feConfigs: FastGPTFeConfigsType;
   systemEnv: SystemEnvType;
-  chatModels: ChatModelItemType[];
-  qaModels: LLMModelItemType[];
-  cqModels: FunctionModelItemType[];
-  extractModels: FunctionModelItemType[];
-  qgModels: LLMModelItemType[];
+  subPlans?: SubPlanType;
+  llmModels: ChatModelItemType[];
   vectorModels: VectorModelItemType[];
   reRankModels: ReRankModelItemType[];
   audioSpeechModels: AudioSpeechModelType[];
@@ -31,17 +30,24 @@ export type FastGPTFeConfigsType = {
   show_pay?: boolean;
   show_openai_account?: boolean;
   show_promotion?: boolean;
-  hide_app_flow?: boolean;
+  show_team_chat?: boolean;
   concatMd?: string;
+
   docUrl?: string;
   chatbotUrl?: string;
   openAPIDocUrl?: string;
+  systemPluginCourseUrl?: string;
+
   systemTitle?: string;
+  systemDescription?: string;
   googleClientVerKey?: string;
   isPlus?: boolean;
+  show_phoneLogin?: boolean;
+  show_emailLogin?: boolean;
   oauth?: {
     github?: string;
     google?: string;
+    wechat?: string;
   };
   limit?: {
     exportDatasetLimitMinutes?: number;
@@ -52,11 +58,10 @@ export type FastGPTFeConfigsType = {
   customApiDomain?: string;
   customSharePageDomain?: string;
   baseUrl?: string;
-  subscription?: {
-    datasetStoreFreeSize?: number;
-    datasetStorePrice?: number;
-  };
+
+  uploadFileMaxAmount?: number;
   uploadFileMaxSize?: number;
+  lafEnv?: string;
 };
 
 export type SystemEnvType = {
@@ -64,10 +69,8 @@ export type SystemEnvType = {
   vectorMaxProcess: number;
   qaMaxProcess: number;
   pgHNSWEfSearch: number;
-};
+  tokenWorkers: number; // token count max worker
 
-declare global {
-  var feConfigs: FastGPTFeConfigsType;
-  var systemEnv: SystemEnvType;
-  var systemInitd: boolean;
-}
+  oneapiUrl?: string;
+  chatApiKey?: string;
+};

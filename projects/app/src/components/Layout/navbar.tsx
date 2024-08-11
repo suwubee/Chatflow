@@ -2,16 +2,15 @@ import React, { useMemo } from 'react';
 import { Box, BoxProps, Flex, Link, LinkProps } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { useUserStore } from '@/web/support/user/useUserStore';
-import { useChatStore } from '@/web/core/chat/storeChat';
+import { useChatStore } from '@/web/core/chat/context/storeChat';
 import { HUMAN_ICON } from '@fastgpt/global/common/system/constants';
-import { feConfigs } from '@/web/common/system/staticData';
 import NextLink from 'next/link';
 import Badge from '../Badge';
-import Avatar from '../Avatar';
+import Avatar from '@fastgpt/web/components/common/Avatar';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { useTranslation } from 'next-i18next';
 import { useSystemStore } from '@/web/common/system/useSystemStore';
-import MyTooltip from '../MyTooltip';
+import MyTooltip from '@fastgpt/web/components/common/MyTooltip';
 import { getDocPath } from '@/web/common/system/doc';
 
 export enum NavbarTypeEnum {
@@ -23,40 +22,33 @@ const Navbar = ({ unread }: { unread: number }) => {
   const { t } = useTranslation();
   const router = useRouter();
   const { userInfo } = useUserStore();
-  const { gitStar } = useSystemStore();
+  const { gitStar, feConfigs } = useSystemStore();
   const { lastChatAppId, lastChatId } = useChatStore();
   const navbarList = useMemo(
     () => [
       {
-        label: t('navbar.Chat'),
+        label: t('common:navbar.Chat'),
         icon: 'core/chat/chatLight',
         activeIcon: 'core/chat/chatFill',
         link: `/chat?appId=${lastChatAppId}&chatId=${lastChatId}`,
         activeLink: ['/chat']
       },
       {
-        label: t('navbar.Apps'),
+        label: t('common:navbar.Studio'),
         icon: 'core/app/aiLight',
         activeIcon: 'core/app/aiFill',
         link: `/app/list`,
         activeLink: ['/app/list', '/app/detail']
       },
       {
-        label: t('navbar.Plugin'),
-        icon: 'common/navbar/pluginLight',
-        activeIcon: 'common/navbar/pluginFill',
-        link: `/plugin/list`,
-        activeLink: ['/plugin/list', '/plugin/edit']
-      },
-      {
-        label: t('navbar.Datasets'),
+        label: t('common:navbar.Datasets'),
         icon: 'core/dataset/datasetLight',
         activeIcon: 'core/dataset/datasetFill',
         link: `/dataset/list`,
         activeLink: ['/dataset/list', '/dataset/detail']
       },
       {
-        label: t('navbar.Account'),
+        label: t('common:navbar.Account'),
         icon: 'support/user/userLight',
         activeIcon: 'support/user/userFill',
         link: '/account',
@@ -96,14 +88,20 @@ const Navbar = ({ unread }: { unread: number }) => {
       {/* logo */}
       <Box
         flex={'0 0 auto'}
-        mb={5}
+        mb={3}
         border={'2px solid #fff'}
         borderRadius={'50%'}
         overflow={'hidden'}
         cursor={'pointer'}
         onClick={() => router.push('/account')}
       >
-        <Avatar w={'36px'} h={'36px'} src={userInfo?.avatar} fallbackSrc={HUMAN_ICON} />
+        <Avatar
+          w={'36px'}
+          h={'36px'}
+          src={userInfo?.avatar}
+          fallbackSrc={HUMAN_ICON}
+          borderRadius={'50%'}
+        />
       </Box>
       {/* 导航列表 */}
       <Box flex={1}>
@@ -159,13 +157,13 @@ const Navbar = ({ unread }: { unread: number }) => {
             color={'myGray.500'}
           >
             <Badge count={unread}>
-              <MyIcon name={'inform'} width={'22px'} height={'22px'} />
+              <MyIcon name={'support/user/informLight'} width={'22px'} height={'22px'} />
             </Badge>
           </Link>
         </Box>
       )}
       {(feConfigs?.docUrl || feConfigs?.chatbotUrl) && (
-        <MyTooltip label={t('common.system.Use Helper')} placement={'right-end'}>
+        <MyTooltip label={t('common:common.system.Use Helper')} placement={'right-end'}>
           <Link
             {...itemStyles}
             {...hoverStyle}

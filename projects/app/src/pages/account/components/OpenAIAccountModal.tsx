@@ -1,9 +1,9 @@
 import React from 'react';
 import { ModalBody, Box, Flex, Input, ModalFooter, Button } from '@chakra-ui/react';
-import MyModal from '@/components/MyModal';
+import MyModal from '@fastgpt/web/components/common/MyModal';
 import { useTranslation } from 'next-i18next';
 import { useForm } from 'react-hook-form';
-import { useRequest } from '@/web/common/hooks/useRequest';
+import { useRequest } from '@fastgpt/web/hooks/useRequest';
 import type { UserType } from '@fastgpt/global/support/user/type.d';
 import { feConfigs } from '@/web/common/system/staticData';
 
@@ -36,7 +36,7 @@ const OpenAIAccountModal = ({
     onSuccess(res) {
       onClose();
     },
-    errorToast: t('user.Set OpenAI Account Failed')
+    errorToast: t('common:user.Set OpenAI Account Failed')
   });
 
   const isBaseUrlFixed = !!feConfigs.baseUrl;
@@ -45,13 +45,12 @@ const OpenAIAccountModal = ({
     <MyModal
       isOpen
       onClose={onClose}
-      iconSrc="/imgs/modal/openai.svg"
-      title={t('user.OpenAI Account Setting')}
+      iconSrc="common/openai"
+      title={t('common:user.OpenAI Account Setting')}
     >
       <ModalBody>
         <Box fontSize={'sm'} color={'myGray.500'}>
-          可以填写 API 的相关秘钥。如果你填写了该内容，在线上平台使用自定义的API接口
-          模型不会计费（不包含知识库训练、索引生成）。请注意你的 Key 是否有访问对应模型的权限。
+          {t('common:info.open_api_notice')}
         </Box>
         {/* API Key Input */}
         <Flex alignItems={'center'} mt={5}>
@@ -68,17 +67,17 @@ const OpenAIAccountModal = ({
             <Input
               flex={1}
               {...register('baseUrl')}
-              placeholder={'请求地址，可填中转地址，请加目录 "v1"'}
+              placeholder={t('common:info.open_api_placeholder')}
             ></Input>
           )}
         </Flex>
       </ModalBody>
       <ModalFooter>
         <Button mr={3} variant={'whiteBase'} onClick={onClose}>
-          取消
+          {t('common:common.Cancel')}
         </Button>
         <Button isLoading={isLoading} onClick={handleSubmit((data) => onSubmit(data))}>
-          确认
+          {t('common:common.Confirm')}
         </Button>
       </ModalFooter>
     </MyModal>

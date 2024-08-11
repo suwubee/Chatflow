@@ -3,7 +3,7 @@ import { Box, Flex } from '@chakra-ui/react';
 import { ChevronRightIcon } from '@chakra-ui/icons';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { useRouter } from 'next/router';
-import { feConfigs } from '@/web/common/system/staticData';
+import { useSystemStore } from '@/web/common/system/useSystemStore';
 import { serviceSideProps } from '@/web/common/utils/i18n';
 import { useTranslation } from 'next-i18next';
 import { getDocPath } from '@/web/common/system/doc';
@@ -11,22 +11,18 @@ import { getDocPath } from '@/web/common/system/doc';
 const Tools = () => {
   const { t } = useTranslation();
   const router = useRouter();
+  const { feConfigs } = useSystemStore();
   const list = [
     {
       icon: 'core/dataset/datasetLight',
-      label: '我的知识库',
+      label: t('common:core.dataset.My Dataset'),
       link: '/dataset/list'
-    },
-    {
-      icon: 'common/navbar/pluginLight',
-      label: '自定义模块',
-      link: '/plugin/list'
     },
     ...(feConfigs?.show_git
       ? [
           {
             icon: 'common/gitLight',
-            label: 'GitHub 地址',
+            label: t('common:core.app.tool_label.github'),
             link: 'https://github.com/labring/FastGPT'
           }
         ]
@@ -35,8 +31,17 @@ const Tools = () => {
       ? [
           {
             icon: 'common/courseLight',
-            label: '使用文档',
+            label: t('common:core.app.tool_label.doc'),
             link: getDocPath('/docs/intro')
+          }
+        ]
+      : []),
+    ...(feConfigs?.show_pay
+      ? [
+          {
+            icon: 'support/bill/priceLight',
+            label: t('common:core.app.tool_label.price'),
+            link: '/price'
           }
         ]
       : [])

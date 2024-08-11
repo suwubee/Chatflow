@@ -1,52 +1,49 @@
-/* 
-    Create one dataset collection
-*/
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { jsonRes } from '@fastgpt/service/common/response';
-import { connectToDatabase } from '@/service/mongo';
+import type { NextApiRequest } from 'next';
 import type { LinkCreateDatasetCollectionParams } from '@fastgpt/global/core/dataset/api.d';
-import { authDataset } from '@fastgpt/service/support/permission/auth/dataset';
+import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
 import { createOneCollection } from '@fastgpt/service/core/dataset/collection/controller';
 import {
   TrainingModeEnum,
   DatasetCollectionTypeEnum
 } from '@fastgpt/global/core/dataset/constants';
-import { checkDatasetLimit } from '@fastgpt/service/support/permission/limit/dataset';
+import { checkDatasetLimit } from '@fastgpt/service/support/permission/teamLimit';
 import { predictDataLimitLength } from '@fastgpt/global/core/dataset/utils';
-import { createTrainingBill } from '@fastgpt/service/support/wallet/bill/controller';
-import { BillSourceEnum } from '@fastgpt/global/support/wallet/bill/constants';
-import { getQAModel, getVectorModel } from '@/service/core/ai/model';
+import { createTrainingUsage } from '@fastgpt/service/support/wallet/usage/controller';
+import { UsageSourceEnum } from '@fastgpt/global/support/wallet/usage/constants';
+import { getLLMModel, getVectorModel } from '@fastgpt/service/core/ai/model';
 import { reloadCollectionChunks } from '@fastgpt/service/core/dataset/collection/utils';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { NextAPI } from '@/service/middleware/entry';
+import { WritePermissionVal } from '@fastgpt/global/support/permission/constant';
+import { CreateCollectionResponse } from '@/global/core/dataset/api';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
-  try {
-    await connectToDatabase();
-    const {
-      link,
-      trainingType = TrainingModeEnum.chunk,
-      chunkSize = 512,
-      chunkSplitter,
-      qaPrompt,
-      ...body
-    } = req.body as LinkCreateDatasetCollectionParams;
+async function handler(req: NextApiRequest): CreateCollectionResponse {
+  const {
+    link,
+    trainingType = TrainingModeEnum.chunk,
+    chunkSize = 512,
+    chunkSplitter,
+    qaPrompt,
+    ...body
+  } = req.body as LinkCreateDatasetCollectionParams;
 
-    const { teamId, tmbId, dataset } = await authDataset({
-      req,
-      authToken: true,
-      authApiKey: true,
-      datasetId: body.datasetId,
-      per: 'w'
-    });
+  const { teamId, tmbId, dataset } = await authDataset({
+    req,
+    authToken: true,
+    authApiKey: true,
+    datasetId: body.datasetId,
+    per: WritePermissionVal
+  });
 
-    // 1. check dataset limit
-    await checkDatasetLimit({
-      teamId,
-      freeSize: global.feConfigs?.subscription?.datasetStoreFreeSize,
-      insertLen: predictDataLimitLength(trainingType, new Array(10))
-    });
+  // 1. check dataset limit
+  await checkDatasetLimit({
+    teamId,
+    insertLen: predictDataLimitLength(trainingType, new Array(10))
+  });
 
+  return mongoSessionRun(async (session) => {
     // 2. create collection
-    const collectionId = await createOneCollection({
+    const collection = await createOneCollection({
       ...body,
       name: link,
       teamId,
@@ -58,31 +55,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       chunkSplitter,
       qaPrompt,
 
-      rawLink: link
+      rawLink: link,
+      session
     });
 
     // 3. create bill and start sync
-    const { billId } = await createTrainingBill({
+    const { billId } = await createTrainingUsage({
       teamId,
       tmbId,
       appName: 'core.dataset.collection.Sync Collection',
-      billSource: BillSourceEnum.training,
+      billSource: UsageSourceEnum.training,
       vectorModel: getVectorModel(dataset.vectorModel).name,
-      agentModel: getQAModel(dataset.agentModel).name
-    });
-    await reloadCollectionChunks({
-      collectionId,
-      tmbId,
-      billId
+      agentModel: getLLMModel(dataset.agentModel).name,
+      session
     });
 
-    jsonRes(res, {
-      data: { collectionId }
+    // load
+    const result = await reloadCollectionChunks({
+      collection: {
+        ...collection.toObject(),
+        datasetId: dataset
+      },
+      tmbId,
+      billId,
+      session
     });
-  } catch (err) {
-    jsonRes(res, {
-      code: 500,
-      error: err
-    });
-  }
+
+    return {
+      collectionId: collection._id,
+      results: {
+        insertLen: result.insertLen
+      }
+    };
+  });
 }
+
+export default NextAPI(handler);

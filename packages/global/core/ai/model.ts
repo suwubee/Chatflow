@@ -2,21 +2,30 @@ import type { LLMModelItemType, VectorModelItemType } from './model.d';
 
 export const defaultQAModels: LLMModelItemType[] = [
   {
-    model: 'gpt-3.5-turbo-16k',
-    name: 'GPT35-16k',
+    model: 'gpt-4o-mini',
+    name: 'gpt-4o-mini',
     maxContext: 16000,
     maxResponse: 16000,
-    inputPrice: 0,
-    outputPrice: 0
+    quoteMaxToken: 13000,
+    maxTemperature: 1.2,
+    charsPointsPrice: 0,
+    censor: false,
+    vision: false,
+    datasetProcess: true,
+    toolChoice: true,
+    functionCall: false,
+    customCQPrompt: '',
+    customExtractPrompt: '',
+    defaultSystemChatPrompt: '',
+    defaultConfig: {}
   }
 ];
 
 export const defaultVectorModels: VectorModelItemType[] = [
   {
-    model: 'text-embedding-ada-002',
+    model: 'text-embedding-3-small',
     name: 'Embedding-2',
-    inputPrice: 0,
-    outputPrice: 0,
+    charsPointsPrice: 0,
     defaultToken: 500,
     maxToken: 3000,
     weight: 100

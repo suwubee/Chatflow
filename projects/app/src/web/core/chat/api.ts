@@ -1,12 +1,15 @@
 import { GET, POST, DELETE, PUT } from '@/web/common/api/request';
-import type { ChatHistoryItemType } from '@fastgpt/global/core/chat/type.d';
+import type { ChatHistoryItemType, ChatHistoryItemResType } from '@fastgpt/global/core/chat/type.d';
+import { getResDataQuery } from '@/pages/api/core/chat/getResData';
 import type {
   CloseCustomFeedbackParams,
   InitChatProps,
   InitChatResponse,
   InitOutLinkChatProps,
-  getHistoriesProps
+  GetHistoriesProps,
+  InitTeamChatProps
 } from '@/global/core/chat/api.d';
+
 import type {
   AdminUpdateFeedbackParams,
   ClearHistoriesProps,
@@ -15,6 +18,8 @@ import type {
   UpdateHistoryProps
 } from '@/global/core/chat/api.d';
 import { UpdateChatFeedbackProps } from '@fastgpt/global/core/chat/api';
+import { AuthTeamTagTokenProps } from '@fastgpt/global/support/user/team/tag';
+import { AppListItemType } from '@fastgpt/global/core/app/type';
 
 /**
  * 获取初始化聊天内容
@@ -23,13 +28,18 @@ export const getInitChatInfo = (data: InitChatProps) =>
   GET<InitChatResponse>(`/core/chat/init`, data);
 export const getInitOutLinkChatInfo = (data: InitOutLinkChatProps) =>
   GET<InitChatResponse>(`/core/chat/outLink/init`, data);
-
+export const getTeamChatInfo = (data: InitTeamChatProps) =>
+  GET<InitChatResponse>(`/core/chat/team/init`, data);
 /**
  * get current window history(appid or shareId)
  */
-export const getChatHistories = (data: getHistoriesProps) =>
+export const getChatHistories = (data: GetHistoriesProps) =>
   POST<ChatHistoryItemType[]>('/core/chat/getHistories', data);
-
+/**
+ * get detail responseData by dataId appId chatId
+ */
+export const getChatResData = (data: getResDataQuery) =>
+  GET<ChatHistoryItemResType[]>(`/core/chat/getResData`, data);
 /**
  * delete one history
  */
@@ -37,7 +47,7 @@ export const delChatHistoryById = (data: DelHistoryProps) => DELETE(`/core/chat/
 /**
  * clear all history by appid
  */
-export const clearChatHistoryByAppId = (data: ClearHistoriesProps) =>
+export const delClearChatHistories = (data: ClearHistoriesProps) =>
   DELETE(`/core/chat/clearHistories`, data);
 
 /**
@@ -60,3 +70,18 @@ export const updateChatAdminFeedback = (data: AdminUpdateFeedbackParams) =>
 
 export const closeCustomFeedback = (data: CloseCustomFeedbackParams) =>
   POST('/core/chat/feedback/closeCustom', data).catch();
+
+/* team chat */
+/**
+ * Get the app that can be used with this token
+ */
+export const getMyTokensApps = (data: AuthTeamTagTokenProps) =>
+  GET<AppListItemType[]>(`/proApi/support/user/team/tag/getAppsByTeamTokens`, data);
+
+/**
+ * 获取团队分享的对话列表 initTeamChat
+ * @param data
+ * @returns
+ */
+export const getinitTeamChat = (data: { teamId: string; authToken: string; appId: string }) =>
+  GET(`/proApi/core/chat/initTeamChat`, data);

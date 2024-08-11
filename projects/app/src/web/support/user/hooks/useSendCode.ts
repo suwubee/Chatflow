@@ -1,63 +1,50 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { sendAuthCode } from '@/web/support/user/api';
-import { UserAuthTypeEnum } from '@fastgpt/global/support/user/constant';
-import { useToast } from '@/web/common/hooks/useToast';
-import { feConfigs } from '@/web/common/system/staticData';
-import { getErrText } from '@fastgpt/global/common/error/utils';
+import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
 import { useTranslation } from 'next-i18next';
-
-let timer: any;
+import { useSystemStore } from '@/web/common/system/useSystemStore';
+import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
+import { i18nT } from '@fastgpt/web/i18n/utils';
+let timer: NodeJS.Timeout;
 
 export const useSendCode = () => {
   const { t } = useTranslation();
-  const { toast } = useToast();
-  const [codeSending, setCodeSending] = useState(false);
+  const { feConfigs } = useSystemStore();
   const [codeCountDown, setCodeCountDown] = useState(0);
-  const sendCodeText = useMemo(() => {
-    if (codeSending) return t('support.user.auth.Sending Code');
-    if (codeCountDown >= 10) {
-      return `${codeCountDown}s后重新获取`;
-    }
-    if (codeCountDown > 0) {
-      return `0${codeCountDown}s后重新获取`;
-    }
-    return '获取验证码';
-  }, [codeCountDown, codeSending, t]);
 
-  const sendCode = useCallback(
+  const { runAsync: sendCode, loading: codeSending } = useRequest2(
     async ({ username, type }: { username: string; type: `${UserAuthTypeEnum}` }) => {
       if (codeCountDown > 0) return;
-      setCodeSending(true);
-      try {
-        await sendAuthCode({
-          username,
-          type,
-          googleToken: await getClientToken(feConfigs.googleClientVerKey)
+      const googleToken = await getClientToken(feConfigs.googleClientVerKey);
+      await sendAuthCode({ username, type, googleToken });
+      setCodeCountDown(60);
+
+      timer = setInterval(() => {
+        setCodeCountDown((val) => {
+          if (val <= 0) {
+            clearInterval(timer);
+          }
+          return val - 1;
         });
-        setCodeCountDown(60);
-        timer = setInterval(() => {
-          setCodeCountDown((val) => {
-            if (val <= 0) {
-              clearInterval(timer);
-            }
-            return val - 1;
-          });
-        }, 1000);
-        toast({
-          title: '验证码已发送',
-          status: 'success',
-          position: 'top'
-        });
-      } catch (error: any) {
-        toast({
-          title: getErrText(error, '验证码发送异常'),
-          status: 'error'
-        });
-      }
-      setCodeSending(false);
+      }, 1000);
     },
-    [codeCountDown, toast]
+    {
+      successToast: i18nT('user:password.code_sended'),
+      errorToast: i18nT('user:password.code_send_error'),
+      refreshDeps: [codeCountDown, feConfigs?.googleClientVerKey]
+    }
   );
+
+  const sendCodeText = useMemo(() => {
+    if (codeSending) return t('common:support.user.auth.Sending Code');
+    if (codeCountDown >= 10) {
+      return `${codeCountDown}${t('user:password.get_code_again')}`;
+    }
+    if (codeCountDown > 0) {
+      return `0${codeCountDown}${t('user:password.get_code_again')}`;
+    }
+    return t('user:password.get_code');
+  }, [codeCountDown, codeSending, t]);
 
   return {
     codeSending,

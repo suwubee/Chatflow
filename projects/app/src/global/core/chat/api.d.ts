@@ -1,6 +1,7 @@
-import type { AppTTSConfigType } from '@fastgpt/global/core/module/type.d';
-import { ModuleItemType } from '../module/type';
-import { AdminFbkType, ChatItemType, moduleDispatchResType } from '@fastgpt/global/core/chat/type';
+import type { AppChatConfigType, AppTTSConfigType } from '@fastgpt/global/core/app/type.d';
+import { AdminFbkType, ChatItemType } from '@fastgpt/global/core/chat/type';
+import type { OutLinkChatAuthProps } from '@fastgpt/global/support/permission/chat.d';
+import { AppTypeEnum } from '@fastgpt/global/core/app/constants';
 
 export type GetChatSpeechProps = {
   ttsConfig: AppTTSConfigType;
@@ -16,8 +17,14 @@ export type InitChatProps = {
 };
 export type InitOutLinkChatProps = {
   chatId?: string;
-  shareId?: string;
-  outLinkUid?: string;
+  shareId: string;
+  outLinkUid: string;
+};
+export type InitTeamChatProps = {
+  teamId: string;
+  appId: string;
+  chatId?: string;
+  teamToken: string;
 };
 export type InitChatResponse = {
   chatId?: string;
@@ -27,51 +34,43 @@ export type InitChatResponse = {
   variables: Record<string, any>;
   history: ChatItemType[];
   app: {
-    userGuideModule?: ModuleItemType;
+    chatConfig?: AppChatConfigType;
     chatModels?: string[];
     name: string;
     avatar: string;
     intro: string;
     canUse?: boolean;
+    type: `${AppTypeEnum}`;
+    pluginInputs: FlowNodeInputItemType[];
   };
 };
 
 /* ---------- history ----------- */
-export type getHistoriesProps = {
+export type GetHistoriesProps = OutLinkChatAuthProps & {
   appId?: string;
-  // share chat
-  shareId?: string;
-  outLinkUid?: string; // authToken/uid
 };
 
-export type UpdateHistoryProps = {
+export type UpdateHistoryProps = OutLinkChatAuthProps & {
   appId: string;
   chatId: string;
+  title?: string;
   customTitle?: string;
   top?: boolean;
-  shareId?: string;
-  outLinkUid?: string;
 };
 
-export type DelHistoryProps = {
+export type DelHistoryProps = OutLinkChatAuthProps & {
   appId: string;
   chatId: string;
-  shareId?: string;
-  outLinkUid?: string;
 };
-export type ClearHistoriesProps = {
+export type ClearHistoriesProps = OutLinkChatAuthProps & {
   appId?: string;
-  shareId?: string;
-  outLinkUid?: string;
 };
 
 /* -------- chat item ---------- */
-export type DeleteChatItemProps = {
+export type DeleteChatItemProps = OutLinkChatAuthProps & {
   appId: string;
   chatId: string;
   contentId?: string;
-  shareId?: string;
-  outLinkUid?: string;
 };
 
 export type AdminUpdateFeedbackParams = AdminFbkType & {

@@ -1,27 +1,39 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '@/service/mongo';
 import { sseErrRes } from '@fastgpt/service/common/response';
-import { sseResponseEventEnum } from '@fastgpt/service/common/response/constant';
+import { SseResponseEventEnum } from '@fastgpt/global/core/workflow/runtime/constants';
 import { responseWrite } from '@fastgpt/service/common/response';
-import type { ModuleItemType } from '@fastgpt/global/core/module/type.d';
-import { pushChatBill } from '@/service/support/wallet/bill/push';
-import { BillSourceEnum } from '@fastgpt/global/support/wallet/bill/constants';
-import type { ChatItemType } from '@fastgpt/global/core/chat/type';
-import { authApp } from '@fastgpt/service/support/permission/auth/app';
-import { dispatchModules } from '@/service/moduleDispatch';
+import { pushChatUsage } from '@/service/support/wallet/usage/push';
+import { UsageSourceEnum } from '@fastgpt/global/support/wallet/usage/constants';
+import type { UserChatItemValueItemType } from '@fastgpt/global/core/chat/type';
+import { authApp } from '@fastgpt/service/support/permission/app/auth';
+import { dispatchWorkFlow } from '@fastgpt/service/core/workflow/dispatch';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import { getUserAndAuthBalance } from '@fastgpt/service/support/user/controller';
+import { getUserChatInfoAndAuthTeamPoints } from '@/service/support/permission/auth/team';
+import { RuntimeEdgeItemType } from '@fastgpt/global/core/workflow/type/edge';
+import { RuntimeNodeItemType } from '@fastgpt/global/core/workflow/runtime/type';
+import { removeEmptyUserInput } from '@fastgpt/global/core/chat/utils';
+import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
+import { AppTypeEnum } from '@fastgpt/global/core/app/constants';
+import {
+  removePluginInputVariables,
+  updatePluginInputByVariables
+} from '@fastgpt/global/core/workflow/utils';
+import { NextAPI } from '@/service/middleware/entry';
+import { GPTMessages2Chats } from '@fastgpt/global/core/chat/adapt';
+import { ChatCompletionMessageParam } from '@fastgpt/global/core/ai/type';
+import { AppChatConfigType } from '@fastgpt/global/core/app/type';
 
 export type Props = {
-  history: ChatItemType[];
-  prompt: string;
-  modules: ModuleItemType[];
+  messages: ChatCompletionMessageParam[];
+  nodes: RuntimeNodeItemType[];
+  edges: RuntimeEdgeItemType[];
   variables: Record<string, any>;
   appId: string;
   appName: string;
+  chatConfig: AppChatConfigType;
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   res.on('close', () => {
     res.end();
   });
@@ -30,68 +42,90 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.end();
   });
 
-  let { modules = [], history = [], prompt, variables = {}, appName, appId } = req.body as Props;
+  let {
+    nodes = [],
+    edges = [],
+    messages = [],
+    variables = {},
+    appName,
+    appId,
+    chatConfig
+  } = req.body as Props;
   try {
-    await connectToDatabase();
-    if (!history || !modules || !prompt) {
-      throw new Error('Prams Error');
-    }
-    if (!Array.isArray(modules)) {
-      throw new Error('history is not array');
-    }
+    // [histories, user]
+    const chatMessages = GPTMessages2Chats(messages);
+    const userInput = chatMessages.pop()?.value as UserChatItemValueItemType[] | undefined;
 
     /* user auth */
-    const [_, { teamId, tmbId }] = await Promise.all([
-      authApp({ req, authToken: true, appId, per: 'r' }),
+    const [{ app }, { teamId, tmbId }] = await Promise.all([
+      authApp({ req, authToken: true, appId, per: ReadPermissionVal }),
       authCert({
         req,
         authToken: true
       })
     ]);
+    const isPlugin = app.type === AppTypeEnum.plugin;
+
+    if (!Array.isArray(nodes)) {
+      throw new Error('Nodes is not array');
+    }
+    if (!Array.isArray(edges)) {
+      throw new Error('Edges is not array');
+    }
+
+    // Plugin need to replace inputs
+    if (isPlugin) {
+      nodes = updatePluginInputByVariables(nodes, variables);
+      variables = removePluginInputVariables(variables, nodes);
+    } else {
+      if (!userInput) {
+        throw new Error('Params Error');
+      }
+    }
 
     // auth balance
-    const user = await getUserAndAuthBalance({
-      tmbId,
-      minBalance: 0
-    });
+    const { user } = await getUserChatInfoAndAuthTeamPoints(tmbId);
 
     /* start process */
-    const { responseData } = await dispatchModules({
+    const { flowResponses, flowUsages } = await dispatchWorkFlow({
       res,
+      requestOrigin: req.headers.origin,
       mode: 'test',
       teamId,
       tmbId,
       user,
-      appId,
-      modules,
+      app,
+      runtimeNodes: nodes,
+      runtimeEdges: edges,
       variables,
-      histories: history,
-      startParams: {
-        userChatInput: prompt
-      },
+      query: removeEmptyUserInput(userInput),
+      chatConfig,
+      histories: chatMessages,
       stream: true,
-      detail: true
+      detail: true,
+      maxRunTimes: 200
     });
 
     responseWrite({
       res,
-      event: sseResponseEventEnum.answer,
+      event: SseResponseEventEnum.answer,
       data: '[DONE]'
     });
     responseWrite({
       res,
-      event: sseResponseEventEnum.appStreamResponse,
-      data: JSON.stringify(responseData)
+      event: SseResponseEventEnum.flowResponses,
+      data: JSON.stringify(flowResponses)
     });
+
     res.end();
 
-    pushChatBill({
+    pushChatUsage({
       appName,
       appId,
       teamId,
       tmbId,
-      source: BillSourceEnum.fastgpt,
-      response: responseData
+      source: UsageSourceEnum.fastgpt,
+      flowUsages
     });
   } catch (err: any) {
     res.status(500);
@@ -99,6 +133,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.end();
   }
 }
+
+export default NextAPI(handler);
 
 export const config = {
   api: {

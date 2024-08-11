@@ -1,59 +1,77 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoChat } from '@fastgpt/service/core/chat/chatSchema';
 import { MongoChatItem } from '@fastgpt/service/core/chat/chatItemSchema';
 import { ClearHistoriesProps } from '@/global/core/chat/api';
 import { authOutLink } from '@/service/support/permission/auth/outLink';
 import { ChatSourceEnum } from '@fastgpt/global/core/chat/constants';
+import { authTeamSpaceToken } from '@/service/support/permission/auth/team';
+import { NextAPI } from '@/service/middleware/entry';
+import { deleteChatFiles } from '@fastgpt/service/core/chat/controller';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 
 /* clear chat history */
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    await connectToDatabase();
-    const { appId, shareId, outLinkUid } = req.query as ClearHistoriesProps;
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { appId, shareId, outLinkUid, teamId, teamToken } = req.query as ClearHistoriesProps;
 
-    const match = await (async () => {
-      if (shareId && outLinkUid) {
-        const { uid } = await authOutLink({ shareId, outLinkUid });
+  let chatAppId = appId!;
 
-        return {
-          shareId,
-          outLinkUid: uid
-        };
-      }
-      if (appId) {
-        const { tmbId } = await authCert({ req, authToken: true });
+  const match = await (async () => {
+    if (shareId && outLinkUid) {
+      const { appId, uid } = await authOutLink({ shareId, outLinkUid });
 
-        return {
-          appId,
-          tmbId,
-          source: ChatSourceEnum.online
-        };
-      }
+      chatAppId = appId;
+      return {
+        shareId,
+        outLinkUid: uid
+      };
+    }
+    if (teamId && teamToken) {
+      const { uid } = await authTeamSpaceToken({ teamId, teamToken });
+      return {
+        teamId,
+        appId,
+        outLinkUid: uid
+      };
+    }
+    if (appId) {
+      const { tmbId } = await authCert({ req, authToken: true });
 
-      return Promise.reject('Param are error');
-    })();
+      return {
+        tmbId,
+        appId,
+        source: ChatSourceEnum.online
+      };
+    }
 
-    // find chatIds
-    const list = await MongoChat.find(match, 'chatId').lean();
-    const idList = list.map((item) => item.chatId);
+    return Promise.reject('Param are error');
+  })();
 
-    await MongoChatItem.deleteMany({
-      appId,
-      chatId: { $in: idList }
-    });
-    await MongoChat.deleteMany({
-      appId,
-      chatId: { $in: idList }
-    });
+  // find chatIds
+  const list = await MongoChat.find(match, 'chatId').lean();
+  const idList = list.map((item) => item.chatId);
 
-    jsonRes(res);
-  } catch (err) {
-    jsonRes(res, {
-      code: 500,
-      error: err
-    });
-  }
+  await deleteChatFiles({ chatIdList: idList });
+
+  await mongoSessionRun(async (session) => {
+    await MongoChatItem.deleteMany(
+      {
+        appId: chatAppId,
+        chatId: { $in: idList }
+      },
+      { session }
+    );
+    await MongoChat.deleteMany(
+      {
+        appId: chatAppId,
+        chatId: { $in: idList }
+      },
+      { session }
+    );
+  });
+
+  jsonRes(res);
 }
+
+export default NextAPI(handler);

@@ -9,6 +9,9 @@ import {
   TrainingModeEnum
 } from '@fastgpt/global/core/dataset/constants';
 import { hashStr } from '@fastgpt/global/common/string/tools';
+import { ClientSession } from '../../../common/mongo';
+import { PushDatasetDataResponse } from '@fastgpt/global/core/dataset/api';
+import { MongoDatasetCollectionTags } from '../tag/schema';
 
 /**
  * get all collection by top collectionId
@@ -41,7 +44,7 @@ export async function findCollectionAndChild({
     return collections;
   }
   const [collection, childCollections] = await Promise.all([
-    MongoDatasetCollection.findById(collectionId, fields),
+    MongoDatasetCollection.findById(collectionId, fields).lean(),
     find(collectionId)
   ]);
 
@@ -50,29 +53,6 @@ export async function findCollectionAndChild({
   }
 
   return [collection, ...childCollections];
-}
-
-export async function getDatasetCollectionPaths({
-  parentId = ''
-}: {
-  parentId?: string;
-}): Promise<ParentTreePathItemType[]> {
-  async function find(parentId?: string): Promise<ParentTreePathItemType[]> {
-    if (!parentId) {
-      return [];
-    }
-
-    const parent = await MongoDatasetCollection.findOne({ _id: parentId }, 'name parentId');
-
-    if (!parent) return [];
-
-    const paths = await find(parent.parentId);
-    paths.push({ parentId, parentName: parent.name });
-
-    return paths;
-  }
-
-  return await find(parentId);
 }
 
 export function getCollectionUpdateTime({ name, time }: { time?: Date; name: string }) {
@@ -149,18 +129,18 @@ export const getCollectionAndRawText = async ({
 
 /* link collection start load data */
 export const reloadCollectionChunks = async ({
-  collectionId,
   collection,
   tmbId,
   billId,
-  rawText
+  rawText,
+  session
 }: {
-  collectionId?: string;
-  collection?: CollectionWithDatasetType;
+  collection: CollectionWithDatasetType;
   tmbId: string;
   billId?: string;
   rawText?: string;
-}) => {
+  session: ClientSession;
+}): Promise<PushDatasetDataResponse> => {
   const {
     title,
     rawText: newRawText,
@@ -168,11 +148,13 @@ export const reloadCollectionChunks = async ({
     isSameRawText
   } = await getCollectionAndRawText({
     collection,
-    collectionId,
     newRawText: rawText
   });
 
-  if (isSameRawText) return;
+  if (isSameRawText)
+    return {
+      insertLen: 0
+    };
 
   // split data
   const { chunks } = splitText2Chunks({
@@ -186,7 +168,8 @@ export const reloadCollectionChunks = async ({
     if (col.trainingType === TrainingModeEnum.qa) return col.datasetId.agentModel;
     return Promise.reject('Training model error');
   })();
-  await MongoDatasetTraining.insertMany(
+
+  const result = await MongoDatasetTraining.insertMany(
     chunks.map((item, i) => ({
       teamId: col.teamId,
       tmbId,
@@ -199,13 +182,55 @@ export const reloadCollectionChunks = async ({
       q: item,
       a: '',
       chunkIndex: i
-    }))
+    })),
+    { session }
   );
 
   // update raw text
-  await MongoDatasetCollection.findByIdAndUpdate(col._id, {
-    ...(title && { name: title }),
-    rawTextLength: newRawText.length,
-    hashRawText: hashStr(newRawText)
+  await MongoDatasetCollection.findByIdAndUpdate(
+    col._id,
+    {
+      ...(title && { name: title }),
+      rawTextLength: newRawText.length,
+      hashRawText: hashStr(newRawText)
+    },
+    { session }
+  );
+
+  return {
+    insertLen: result.length
+  };
+};
+
+export const createOrGetCollectionTags = async ({
+  tags = [],
+  datasetId,
+  teamId,
+  session
+}: {
+  tags?: string[];
+  datasetId: string;
+  teamId: string;
+  session?: ClientSession;
+}): Promise<string[]> => {
+  if (!tags.length) return [];
+  const existingTags = await MongoDatasetCollectionTags.find({
+    teamId,
+    datasetId,
+    $expr: { $in: ['$tag', tags] }
   });
+
+  const existingTagContents = existingTags.map((tag) => tag.tag);
+  const newTagContents = tags.filter((tag) => !existingTagContents.includes(tag));
+
+  const newTags = await MongoDatasetCollectionTags.insertMany(
+    newTagContents.map((tagContent) => ({
+      teamId,
+      datasetId,
+      tag: tagContent
+    })),
+    { session }
+  );
+
+  return [...existingTags.map((tag) => tag._id), ...newTags.map((tag) => tag._id)];
 };
