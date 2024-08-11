@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ModalBody, Box, Flex, Input, ModalFooter, Button } from '@chakra-ui/react';
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import { useTranslation } from 'next-i18next';
 import { useForm } from 'react-hook-form';
 import { useRequest } from '@fastgpt/web/hooks/useRequest';
 import type { UserType } from '@fastgpt/global/support/user/type.d';
-import { feConfigs } from '@/web/common/system/staticData';
+import { clientInitData } from '@/web/common/system/staticData';
 
 const OpenAIAccountModal = ({
   defaultData,
@@ -17,6 +17,21 @@ const OpenAIAccountModal = ({
   onClose: () => void;
 }) => {
   const { t } = useTranslation();
+  const [feConfigs, setFeConfigs] = useState<{ baseUrl?: string }>({});
+
+  useEffect(() => {
+    const fetchFeConfigs = async () => {
+      try {
+        const { feConfigs } = await clientInitData();
+        setFeConfigs(feConfigs);
+      } catch (error) {
+        console.error('Failed to fetch FE configs:', error);
+      }
+    };
+
+    fetchFeConfigs();
+  }, []);
+
   const { register, handleSubmit, getValues } = useForm({
     defaultValues: {
       ...defaultData,
