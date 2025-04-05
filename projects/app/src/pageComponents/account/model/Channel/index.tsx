@@ -47,8 +47,6 @@ const ChannelTable = ({ Tab }: { Tab: React.ReactNode }) => {
   const { t } = useTranslation();
   const { userInfo } = useUserStore();
 
-  const isRoot = userInfo?.username === 'root';
-
   const {
     data: channelList = [],
     runAsync: refreshChannelList,
@@ -98,15 +96,13 @@ const ChannelTable = ({ Tab }: { Tab: React.ReactNode }) => {
 
   return (
     <>
-      {isRoot && (
-        <Flex alignItems={'center'}>
-          {Tab}
-          <Box flex={1} />
-          <Button variant={'whiteBase'} mr={2} onClick={() => setEditChannel(defaultChannel)}>
-            {t('account_model:create_channel')}
-          </Button>
-        </Flex>
-      )}
+      <Flex alignItems={'center'}>
+        {Tab}
+        <Box flex={1} />
+        <Button variant={'whiteBase'} mr={2} onClick={() => setEditChannel(defaultChannel)}>
+          {t('account_model:create_channel')}
+        </Button>
+      </Flex>
       <MyBox flex={'1 0 0'} h={0} isLoading={isLoading}>
         <TableContainer h={'100%'} overflowY={'auto'} fontSize={'sm'}>
           <Table>

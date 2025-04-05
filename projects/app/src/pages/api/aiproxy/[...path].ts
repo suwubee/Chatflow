@@ -2,14 +2,14 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { request as httpsRequest } from 'https';
 import { request as httpRequest } from 'http';
-import { authSystemAdmin } from '@fastgpt/service/support/permission/user/auth';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
 
 const baseUrl = process.env.AIPROXY_API_ENDPOINT;
 const token = process.env.AIPROXY_API_TOKEN;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    await authSystemAdmin({ req });
+    await authCert({ req, authToken: true });
 
     if (!baseUrl || !token) {
       throw new Error('AIPROXY_API_ENDPOINT or AIPROXY_API_TOKEN is not set');
